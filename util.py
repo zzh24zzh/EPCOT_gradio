@@ -1,8 +1,6 @@
 import argparse
-import kipoiseq
-from kipoiseq import Interval
 import numpy as np
-import torch,pickle
+import torch
 from pretrain.track.model import build_track_model
 from cage.model import build_cage_model
 from cop.micro_model import build_microc_model
