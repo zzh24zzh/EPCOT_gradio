@@ -39,11 +39,12 @@ class PositionalEncoding(nn.Module):
         return self.dropout(x)
 
 class finetunemodel(nn.Module):
-    def __init__(self,pretrain_model,hidden_dim,embed_dim,bins,crop=50,num_class=245):
+    def __init__(self,pretrain_model,hidden_dim,embed_dim,bins,crop=50,num_class=245,return_embed=True):
         super().__init__()
         self.pretrain_model = pretrain_model
         self.bins=bins
         self.crop=crop
+        self.return_embed = return_embed
         self.attention_pool = AttentionPool(hidden_dim)
         self.project=nn.Sequential(
             Rearrange('(b n) c -> b c n', n=bins),
@@ -71,7 +72,10 @@ class finetunemodel(nn.Module):
 
         x = self.transformer(x)
         out = self.prediction_head(x[:, self.crop:-self.crop, :])
-        return out
+        if self.return_embed:
+            return x
+        else:
+            return out
 
 
 
@@ -95,6 +99,7 @@ def build_track_model(args):
             backbone=backbone,
             transfomer=transformer,
         )
-    model=finetunemodel(pretrain_model,hidden_dim=args.hidden_dim,embed_dim=args.embed_dim,bins=args.bins,crop=args.crop)
+    model=finetunemodel(pretrain_model,hidden_dim=args.hidden_dim,embed_dim=args.embed_dim,
+                        bins=args.bins,crop=args.crop,return_embed=args.return_embed)
 
     return model

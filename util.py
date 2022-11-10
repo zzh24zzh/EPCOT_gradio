@@ -37,6 +37,7 @@ def parser_args_epi(parent_parser):
     parser.add_argument('--bins', type=int, default=500)
     parser.add_argument('--crop', type=int, default=50)
     parser.add_argument('--embed_dim', default=768, type=int)
+    parser.add_argument('--return_embed', default=False, action='store_true')
     args, unknown = parser.parse_known_args()
     return args
 
@@ -73,6 +74,7 @@ def parser_args_microc(parent_parser):
     parser.add_argument('--bins', type=int, default=500)
     parser.add_argument('--crop', type=int, default=10)
     parser.add_argument('--embed_dim', default=768, type=int)
+    parser.add_argument('--return_embed', default=True, action='store_false')
     args, unknown = parser.parse_known_args()
     return args
 

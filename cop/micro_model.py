@@ -93,6 +93,7 @@ class Downstream_microc_model(nn.Module):
 
     def forward(self,x):
         x=self.pretrain_model(x)
+        print(x.shape)
         x=self.project(x)
         x = self.output_head(x)
         x = self.dilate_tower(x, self.crop)
