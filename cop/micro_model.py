@@ -66,7 +66,6 @@ class Downstream_microc_model(nn.Module):
         hidden_dim=256,
         in_dim=64,
         crop=10,
-        cls_token=False,
     ):
         super().__init__()
         self.project = nn.Sequential(
@@ -75,7 +74,6 @@ class Downstream_microc_model(nn.Module):
             nn.Linear(512, hidden_dim),
         )
 
-        self.cls_token=cls_token
         self.pretrain_model=pretrain_model
         self.dilate_tower = dilated_tower(embed_dim=hidden_dim, in_channel=in_dim,dilate_rate=5)
         self.prediction_head = nn.Linear(in_dim, 1)
@@ -94,10 +92,7 @@ class Downstream_microc_model(nn.Module):
         return x[:, d, :]
 
     def forward(self,x):
-        if self.cls_token:
-            x, _=self.pretrain_model(x)
-        else:
-            x=self.pretrain_model(x)
+        x=self.pretrain_model(x)
         x=self.project(x)
         x = self.output_head(x)
         x = self.dilate_tower(x, self.crop)
@@ -114,7 +109,6 @@ def build_microc_model(args):
     model=Downstream_microc_model(
         pretrain_model=pretrain_model,
         embed_dim=args.embed_dim,
-        cls_token=args.cls_token,
         crop=args.crop
     )
     return model
