@@ -4,10 +4,12 @@ import torch
 from pretrain.track.model import build_track_model
 from cage.model import build_cage_model
 from cop.micro_model import build_microc_model
-from scipy.sparse import load_npz
-# from COP.microc.model import build_pretrain_model_microc
-import matplotlib.pyplot as plt
-from matplotlib.gridspec import GridSpec
+from cop.hic_model import build_hic_model
+
+
+
+
+
 
 def parser_args():
     """
@@ -59,10 +61,7 @@ def parser_args_hic(parent_parser):
     parser=argparse.ArgumentParser(parents=[parent_parser],add_help = False)
     parser.add_argument('--bins', type=int, default=200)
     parser.add_argument('--crop', type=int, default=4)
-    parser.add_argument('--pretrain_path', type=str, default='none')
     parser.add_argument('--embed_dim', default=256, type=int)
-    parser.add_argument('--trunk',  type=str, default='transformer')
-    parser.add_argument('--fine_tune', default=False, action='store_true')
     args, unknown = parser.parse_known_args()
     return args
 
@@ -79,16 +78,12 @@ def parser_args_microc(parent_parser):
     return args
 
 
-# cage_args=parser_args_cage(parser)
-# hic_args=parser_args_hic(parser)
-# microc_args=parser_args_microc(parser)
 
 
-
-def check_region(chrom,region,ref_genome):
+def check_region(chrom,region,ref_genome,region_len):
     region=region.replace(',','')
     start,end=list(map(int, region.split('-')))
-    if end-start != 1000000:
+    if end-start != region_len:
         raise ValueError("Please enter a 1Mb region")
     if start<300 or end > ref_genome.shape[1]-300:
         raise ValueError("The start of input region should be greater than 300 and "
@@ -110,31 +105,6 @@ def search_tf(tf):
     return tf_idx
 
 
-def predict(input_chrom,input_region,input_tf,input_hm,input_file):
-    if input_chrom=='' or input_region=='':
-        return ValueError("Please specify a genomic region")
-    if len(input_file) !=2:
-        return ValueError("Please upload two files only, one for the reference genome and one for ATAC-seq")
-    with open('epigenomes.txt', 'r') as f:
-        epigenomes = f.read().splitlines()
-    filea=load_npz(input_file[0]).toarray()
-    fileb=load_npz(input_file[1]).toarray()
-    ref_genome=filea if filea.shape[0]==4 else fileb
-    atac_seq=filea if filea.shape[0]==1 else fileb
-    chrom,start,end=check_region(input_chrom,input_region,ref_genome)
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-
-    epis=[input_tf]+input_hm
-    epi_idx=np.array([epigenomes.index(epi) for epi in epis])
-
-    out_epi = predict_epis('models/epi_track.pt', [start, end], ref_genome, atac_seq, device)[:,:,epi_idx]
-    print(out_epi.shape)
-    # out_cage = predict_cage(model_path, [start, end], ref_genome, atac_seq, device)
-    # out_microc = predict_microc(model_path, [start, end], ref_genome, atac_seq, device)
-
-    return 1
-
-
 
 
 
@@ -142,7 +112,8 @@ def predict(input_chrom,input_region,input_tf,input_hm,input_file):
 def predict_epis(
         model_path,
         region, ref_genome,atac_seq,
-        device
+        device,
+        cop_type
 ):
     args, parser = get_args()
     epi_args = parser_args_epi(parser)
@@ -152,8 +123,11 @@ def predict_epis(
     pretrain_model.to(device)
     inputs=[]
     start,end=region
-    for loc in range(start+100000,end-100000,400000):
-        inputs.append(generate_input(loc-50000,loc+450000,ref_genome,atac_seq))
+    if cop_type == 'Micro-C (enter a 500 kb region)':
+        inputs.append(generate_input(start,end,ref_genome,atac_seq))
+    else:
+        for loc in range(start+100000,end-100000,400000):
+            inputs.append(generate_input(loc-50000,loc+450000,ref_genome,atac_seq))
     inputs=np.stack(inputs)
     inputs=torch.tensor(inputs).float().to(device)
     pred_epi=[]
@@ -165,7 +139,8 @@ def predict_epis(
 def predict_cage(
         model_path,
         region, ref_genome, atac_seq,
-        device
+        device,
+        cop_type
 ):
     args, parser = get_args()
     cage_args = parser_args_cage(parser)
@@ -175,8 +150,12 @@ def predict_cage(
     cage_model.to(device)
     inputs = []
     start, end = region
-    for loc in range(start + 100000, end - 100000, 200000):
-        inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+    if cop_type == 'Micro-C (enter a 500 kb region)':
+        for loc in range(start + 50000, end - 50000, 200000):
+            inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+    else:
+        for loc in range(start + 100000, end - 100000, 200000):
+            inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
     inputs = np.stack(inputs)
     inputs = torch.tensor(inputs).float().to(device)
     pred_cage=[]
@@ -198,21 +177,23 @@ def complete_mat(mat):
     return mat
 
 
-# def predict_hic(model,chrom,start,end,dnase,fasta_extractor,cross_cell_type=False):
-#     if (end-start)!=1000000:
-#         raise ValueError('Please input a 1Mb region')
-#     input_dnase = read_dnase_pickle(dnase, chrom[3:])
-#     inputs=generate_input(fasta_extractor,chrom,start,end, input_dnase)
-#     device = next(model.parameters()).device
-#     inputs=inputs.unsqueeze(0).float().to(device)
-#     if cross_cell_type:
-#         for m in model.modules():
-#             if m.__class__.__name__.startswith('BatchNorm'):
-#                 m.train()
-#     with torch.no_grad():
-#         pred_hic = model(inputs).detach().cpu().numpy().squeeze()
-#     pred_hic=complete_mat(arraytouptri(pred_hic.squeeze(), hic_args))
-#     return pred_hic
+def predict_hic(
+        model_path,
+        region, ref_genome,atac_seq,
+        device
+):
+    args, parser = get_args()
+    hic_args = parser_args_hic(parser)
+    hic_model = build_hic_model(hic_args)
+    hic_model.load_state_dict(torch.load(model_path,map_location=torch.device(device)))
+    hic_model.eval()
+    hic_model.to(device)
+    start,end=region
+    inputs=np.stack([generate_input(start,end,ref_genome,atac_seq)])
+    inputs=torch.tensor(inputs).float().to(device)
+    with torch.no_grad():
+        temp=hic_model(inputs).detach().cpu().numpy().squeeze()
+    return np.stack([complete_mat(arraytouptri(temp[:,i], hic_args)) for i in range(temp.shape[-1])])
 
 
 def predict_microc(
@@ -226,56 +207,85 @@ def predict_microc(
     microc_model.load_state_dict(torch.load(model_path,map_location=torch.device(device)))
     microc_model.eval()
     microc_model.to(device)
-    inputs=[]
     start,end=region
-    for loc in range(start+20000,end-20000,480000):
-        inputs.append(generate_input(loc-10000,loc+490000,ref_genome,atac_seq))
-    inputs=np.stack(inputs)
+    inputs=np.stack([generate_input(start,end,ref_genome,atac_seq)])
     inputs=torch.tensor(inputs).float().to(device)
-    pred_epi=[]
     with torch.no_grad():
-        for i in range(inputs.shape[0]):
-            temp=microc_model(inputs[i:i+1]).detach().cpu().numpy().squeeze()
-            pred_epi.append(complete_mat(arraytouptri(temp, microc_args)))
-    return np.vstack(pred_epi)
+        temp=microc_model(inputs).detach().cpu().numpy().squeeze()
+    return complete_mat(arraytouptri(temp, microc_args))
 
 
-def make_plots(out_epis,out_cages,out_microc,start,end,epis):
-    num_mod=out_epis.shape[1]+1+1
+def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
+    import pyBigWig,os
+    from zipfile import ZipFile
+    with open('epigenomes.txt', 'r') as f:
+        epigenomes = f.read().splitlines()
 
-    fig = plt.figure(figsize=(4, 5.5))
-    gs = GridSpec(6, 4, wspace=0, hspace=0.2)
+    out_zipfile=ZipFile("tmps/browser_data/tmp_%s-%s-%s.zip"%(chrom,start,end), "w")
+    hdr=[]
+    with open('examples/chrom_size_hg38.txt','r') as f:
+        for line in f:
+            tmp=line.strip().split('\t')
+            hdr.append((tmp[0],int(tmp[1])))
+        # bwOutput.addHeader([('chr18', 80373285)])
+
+    for i in range(out_epis.shape[1]):
+        bwfile = pyBigWig.open("tmps/browser_data/%s.bigWig"%epigenomes[i], 'w')
+        bwfile.addHeader(hdr)
+        # for idx in range((end-start)//1000):
+        bwfile.addEntries(['chr' + str(chrom)]*out_epis.shape[0],[loc for loc in range(start,end,1000)],
+                          ends=[loc+1000 for loc in range(start,end,1000)],values=out_epis[:,i].tolist())
+        bwfile.close()
+        out_zipfile.write("tmps/browser_data/%s.bigWig"%epigenomes[i])
+        os.remove("tmps/browser_data/%s.bigWig"%epigenomes[i])
+    bwfile = pyBigWig.open("tmps/browser_data/cage.bigWig",'w')
+    bwfile.addHeader(hdr)
+
+    bwfile.addEntries(['chr' + str(chrom)] * out_cages.shape[0], [loc for loc in range(start, end, 1000)],
+                      ends=[loc + 1000 for loc in range(start, end, 1000)], values=out_cages.tolist())
+    bwfile.close()
+    out_zipfile.write("tmps/browser_data/cage.bigWig")
+    os.remove("tmps/browser_data/cage.bigWig")
+    cop_lines=[]
+
+    interval=1000 if out_cop.shape[-1]==400 else 5000
+    if out_cop.shape[-1]==400:
+        for bin1 in range(out_cop.shape[-1]):
+            for bin2 in range(bin1,out_cop.shape[-1],1):
+                tmp=['chr' + str(chrom),str(start+bin1*interval),str(start+(bin1+1)*interval),'chr' + str(chrom),
+                                  str(start + bin2 * interval), str(start + (bin2 + 1) * interval),'.',str(np.around(out_cop[bin1,bin2],2)),'.','.'
+                     ]
+                cop_lines.append('\t'.join(tmp)+'\n')
+        with open("tmps/browser_data/microc.bedpe",'w') as f:
+            f.writelines(cop_lines)
+        out_zipfile.write("tmps/browser_data/microc.bedpe")
+        os.remove("tmps/browser_data/microc.bedpe")
+    else:
+        types=['CTCF ChIA-PET','POLR2 ChIA-PET','Hi-C']
+        for i in range(3):
+            for bin1 in range(out_cop.shape[-1]):
+                for bin2 in range(bin1, out_cop.shape[-1], 1):
+                    tmp = ['chr' + str(chrom), str(start + bin1 * interval), str(start + (bin1 + 1) * interval),
+                           'chr' + str(chrom),
+                           str(start + bin2 * interval), str(start + (bin2 + 1) * interval), '.',
+                           str(np.around(out_cop[i,bin1, bin2], 2)), '.', '.'
+                           ]
+                    cop_lines.append('\t'.join(tmp) + '\n')
+            with open("tmps/browser_data/%s.bedpe"%types[i], 'w') as f:
+                f.writelines(cop_lines)
+            out_zipfile.write("tmps/browser_data/%s.bedpe"%types[i])
+            os.remove("tmps/browser_data/%s.bedpe"%types[i])
+
+    out_zipfile.close()
+    return "tmps/browser_data/tmp_%s-%s-%s.zip"%(chrom,start,end)
 
 
 
-def plot_atac(ax,val,color='#17becf'):
-    ax.fill_between(np.arange(val.shape[0]), 0, val, color=color)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.margins(x=0)
-    ax.set_xticks([])
 
-def plot_bindings(ax, val, chr, start, end, color='#17becf'):
-    ax.fill_between(np.arange(val.shape[0]), 0, val, color=color)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.set_xticks(np.arange(0, val.shape[0], val.shape[0] // 5))
-    ax.set_ylim(0, 1)
-    ax.set_xticklabels(np.arange(start, end, (end - start) // 5))
-    ax.margins(x=0)
 
-def plot_cage(ax,val,chr,start,end,color='#17becf'):
-    ax.fill_between(np.arange(val.shape[0]), 0, val, color=color)
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-    ax.spines['bottom'].set_visible(False)
-    ax.set_xlabel('%s:%s-%s'%(chr,start,end))
-    ax.set_xticks(np.arange(0,val.shape[0],val.shape[0]//5))
-    ax.set_xticklabels(np.arange(start,end,(end-start)//5))
-    ax.margins(x=0)
-def plot_hic(ax, mat,cmap='RdBu_r', vmin=0, vmax=5):
-    ax.imshow(mat,cmap=cmap, vmin=vmin, vmax=vmax)
-    ax.set_xticks([])
-    ax.set_yticks([])
+
+
+
+
+
+

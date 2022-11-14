@@ -96,10 +96,7 @@ class finetunemodel(nn.Module):
         x = self.attention_pool(x)
         x = self.project(x)
         x = rearrange(x, 'b c n -> b n c')
-        if self.mode == 'lstm':
-            x, (h_n, h_c) = self.BiLSTM(x)
-        elif self.mode == 'transformer':
-            x = self.transformer(x)
+        x = self.transformer(x)
         x = self.prediction_head(x[:, self.crop:-self.crop, :])
         return x
 
@@ -122,18 +119,6 @@ def build_cage_model(args):
             backbone=backbone,
             transfomer=transformer,
         )
-
-    model_path = '/nfs/turbo/umms-drjieliu/usr/zzh/scEPCOT/pretrain/models/results/pretraining_scklv.pt'
-    model_dict = pretrain_model.state_dict()
-    pretrained_dict = torch.load(model_path, map_location='cpu')
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    print(pretrained_dict.keys())
-    model_dict.update(pretrained_dict)
-    pretrain_model.load_state_dict(model_dict)
-
-    if not args.fine_tune:
-        for param in pretrain_model.parameters():
-            param.requires_grad = False
 
     model=finetunemodel(pretrain_model,hidden_dim=args.hidden_dim,embed_dim=args.embed_dim,
                         bins=args.bins,crop=args.crop)

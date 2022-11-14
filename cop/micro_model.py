@@ -1,8 +1,4 @@
 import os,sys
-# import inspect
-# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-# parentdir = os.path.dirname(currentdir)
-# sys.path.insert(0, parentdir)
 import math
 from pretrain.track.model import build_track_model
 import torch.nn as nn
