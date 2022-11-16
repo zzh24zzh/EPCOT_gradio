@@ -12,6 +12,8 @@ bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --no
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 ```
 
+
+Download and extract the processed input reference sequence
 ```
 !mkdir refSeq
 !gdown 1iqOKKNFwjl9hMZovxxhG-t_Y1MZw45R0 --output refSeq/hg38.tar.gz
