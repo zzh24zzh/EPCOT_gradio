@@ -17,5 +17,5 @@ Download and extract the processed input reference sequence
 ```
 !mkdir refSeq
 !gdown 1iqOKKNFwjl9hMZovxxhG-t_Y1MZw45R0 --output refSeq/hg38.tar.gz
-!tar -xvf refSeq/hg38.tar.gz -C refSeq/ hg38/chr1.npz
+!tar -xvf refSeq/hg38.tar.gz -C refSeq/
 ```
