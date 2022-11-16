@@ -2,11 +2,13 @@
 
 ## Usage
 
-### download the source code
+### Download the source code
 
+```
+git clone https://github.com/zzh24zzh/scEPCOT.git
+```
 
-
-### pre-processing input data
+### Pre-processing input data
 Prepare the input ATAC-seq files
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
