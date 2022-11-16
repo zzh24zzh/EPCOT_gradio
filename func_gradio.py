@@ -25,18 +25,16 @@ def predict_func(input_chrom, cop_type, input_region, input_file):
         chrom, start, end = check_region(input_chrom, input_region, ref_genome,1000000)
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    print(device)
     out_cage = predict_cage(os.path.abspath('models/cage.pt'), [start, end], ref_genome, atac_seq, device,cop_type)
-    print(out_cage.shape)
 
     out_epi = predict_epis(os.path.abspath('models/epi_track.pt'), [start, end], ref_genome, atac_seq, device,cop_type)
     out_epi = rearrange(out_epi, 'i j k -> (i j) k')
-    print(out_epi.shape)
 
     if cop_type == 'Micro-C (enter a 500 kb region)':
         out_cop = predict_microc(os.path.abspath('models/microc.pt'), [start, end], ref_genome, atac_seq, device)[40:-40,40:-40]
         np.savez_compressed( 'tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+50000,end-50000), epi=out_epi, cage=out_cage,
                             cop=out_cop)
-        print(out_cop.shape)
         return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+50000,end-50000),
                 filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+50000,end-50000)]
     else:
@@ -44,7 +42,6 @@ def predict_func(input_chrom, cop_type, input_region, input_file):
         np.savez_compressed('tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 100000, end - 100000), epi=out_epi,
                             cage=out_cage,
                             cop=out_cop)
-        print(out_cop.shape)
 
         return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 100000, end - 100000),
                 filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 100000, end - 100000)]

@@ -1,5 +1,12 @@
-import gdown,os
+import gdown,os,argparse
 
+def parser_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--downloadRefseq', '-d',default=True, action='store_false',
+                          help='whether download reference sequence')
+
+    args = parser.parse_args()
+    return args
 
 def download_models():
     gdown.download_folder('https://drive.google.com/drive/u/1/folders/1oqrRToBfzjfkDoQzy8SGRY1x2qGhAwj1')
@@ -17,9 +24,11 @@ def download_refseq_hg38():
     os.system('tar -xvf refSeq/hg38.tar.gz -C refSeq/ hg38/chr11.npz')
 
 def main():
+    args=parser_args()
     download_models()
     download_examples()
-    download_refseq_hg38()
+    if args.downloadRefseq:
+        download_refseq_hg38()
 
 if __name__=='__main__':
     main()
