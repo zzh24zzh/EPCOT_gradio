@@ -16,13 +16,13 @@ wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX
 bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --normalizeUsing RPGC --effectiveGenomeSize 2913022398 
 --Offset 1 --binSize 1 --numberOfProcessors 12 --blackListFileName /scratch/drjieliu_root/drjieliu/zhenhaoz/ATAC-seq/bam/black_list.bed
 
-# usage: python process_atac.py -i <bigWig_file> -p <prefix> -o <output_directory>
+#usage: python process_atac.py -i <bigWig_file> -p <prefix> -o <output_directory>
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 ```
 
 Download models, input reference genome sequence and example data
 ```
-# the files are downloaded under 'models', 'refSeq', and 'examples' folder
+#the files are downloaded under 'models', 'refSeq', and 'examples' folder
 python download.py
 ```
 
