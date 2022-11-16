@@ -2,6 +2,7 @@
 
 ## Usage
 
+Prepare the input ATAC-seq
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
 
