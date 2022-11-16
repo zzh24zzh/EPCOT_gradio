@@ -10,6 +10,10 @@ bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --no
 
 #usage: python process_atac.py -i <bigWig_file> -p <prefix> -o <output_directory>
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
+```
 
-
+```
+!mkdir refSeq
+!gdown 1iqOKKNFwjl9hMZovxxhG-t_Y1MZw45R0 --output refSeq/hg38.tar.gz
+!tar -xvf refSeq/hg38.tar.gz -C refSeq/ hg38/chr1.npz
 ```
