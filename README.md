@@ -21,4 +21,4 @@ Download and extract the processed input reference sequence
 !tar -xvf refSeq/hg38.tar.gz -C refSeq/
 ```
 
-Generate the Excel file and other input files for [nuclesome browser](https://github.com/nucleome/nucleserver) from the prediction result files
+Generate the Excel file and other supported files for [nuclesome browser](https://github.com/nucleome/nucleserver) from the prediction result files
