@@ -2,6 +2,7 @@
 
 ## Usage
 
+### pre-processing input data
 Prepare the input ATAC-seq files
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
