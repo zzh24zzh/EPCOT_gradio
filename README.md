@@ -2,7 +2,7 @@
 
 ## Usage
 
-### Download the source code
+### Download source code
 
 ```
 git clone https://github.com/zzh24zzh/scEPCOT.git
