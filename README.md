@@ -22,3 +22,7 @@ Download and extract the processed input reference sequence
 ```
 
 Generate the Excel file and other supported files for [nuclesome browser](https://github.com/nucleome/nucleserver) from the prediction result files
+```
+#usage: python makesheet,py -i <input prediction files for browser> -o <out file name.xlsx>
+python makesheet.py -i tmps/browser_data/tmp_11-10550000-10950000.zip -o tmps/tmp.xlsx
+```
