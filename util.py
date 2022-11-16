@@ -99,7 +99,7 @@ def generate_input(start,end,ref_genome,atac_seq):
     return np.stack(inputs)
 
 def search_tf(tf):
-    with open('epigenomes.txt', 'r') as f:
+    with open('examples/epigenomes.txt', 'r') as f:
         epigenomes = f.read().splitlines()
     tf_idx= epigenomes.index(tf)
     return tf_idx
@@ -218,10 +218,18 @@ def predict_microc(
 def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
     import pyBigWig,os
     from zipfile import ZipFile
-    with open('epigenomes.txt', 'r') as f:
+    import zipfile
+    import shutil
+    import uuid
+    with open('examples/epigenomes.txt', 'r') as f:
         epigenomes = f.read().splitlines()
 
-    out_zipfile=ZipFile("tmps/browser_data/tmp_%s-%s-%s.zip"%(chrom,start,end), "w")
+    filename = str(uuid.uuid4())
+    files_to_zip = "tmps/browser_data/"+filename
+    if os.path.exists(files_to_zip):
+        shutil.rmtree(files_to_zip)
+    os.mkdir(files_to_zip)
+
     hdr=[]
     with open('examples/chrom_size_hg38.txt','r') as f:
         for line in f:
@@ -230,56 +238,55 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
         # bwOutput.addHeader([('chr18', 80373285)])
 
     for i in range(out_epis.shape[1]):
-        bwfile = pyBigWig.open("tmps/browser_data/%s.bigWig"%epigenomes[i], 'w')
+        bwfile = pyBigWig.open(os.path.join(files_to_zip,"%s.bigWig"%epigenomes[i]), 'w')
         bwfile.addHeader(hdr)
-        # for idx in range((end-start)//1000):
         bwfile.addEntries(['chr' + str(chrom)]*out_epis.shape[0],[loc for loc in range(start,end,1000)],
                           ends=[loc+1000 for loc in range(start,end,1000)],values=out_epis[:,i].tolist())
         bwfile.close()
-        out_zipfile.write("tmps/browser_data/%s.bigWig"%epigenomes[i])
-        os.remove("tmps/browser_data/%s.bigWig"%epigenomes[i])
-    bwfile = pyBigWig.open("tmps/browser_data/cage.bigWig",'w')
+    bwfile = pyBigWig.open(os.path.join(files_to_zip,"cage.bigWig"),'w')
     bwfile.addHeader(hdr)
 
     bwfile.addEntries(['chr' + str(chrom)] * out_cages.shape[0], [loc for loc in range(start, end, 1000)],
                       ends=[loc + 1000 for loc in range(start, end, 1000)], values=out_cages.tolist())
     bwfile.close()
-    out_zipfile.write("tmps/browser_data/cage.bigWig")
-    os.remove("tmps/browser_data/cage.bigWig")
     cop_lines=[]
 
     interval=1000 if out_cop.shape[-1]==400 else 5000
     if out_cop.shape[-1]==400:
         for bin1 in range(out_cop.shape[-1]):
             for bin2 in range(bin1,out_cop.shape[-1],1):
-                tmp=['chr' + str(chrom),str(start+bin1*interval),str(start+(bin1+1)*interval),'chr' + str(chrom),
-                                  str(start + bin2 * interval), str(start + (bin2 + 1) * interval),'.',str(np.around(out_cop[bin1,bin2],2)),'.','.'
-                     ]
+                # tmp=['chr' + str(chrom),str(start+bin1*interval),str(start+(bin1+1)*interval),'chr' + str(chrom),
+                #                   str(start + bin2 * interval), str(start + (bin2 + 1) * interval),'.',str(np.around(out_cop[bin1,bin2],2)),'.','.'
+                #      ]
+                tmp = ['0', 'chr' + str(chrom), str(start + bin1 * interval), '0', '0', 'chr' + str(chrom),
+                       str(start + bin2 * interval), '1', str(np.around(out_cop[bin1, bin2], 2))]
                 cop_lines.append('\t'.join(tmp)+'\n')
-        with open("tmps/browser_data/microc.bedpe",'w') as f:
+        with open(os.path.join(files_to_zip,"microc.bedpe"),'w') as f:
             f.writelines(cop_lines)
-        out_zipfile.write("tmps/browser_data/microc.bedpe")
-        os.remove("tmps/browser_data/microc.bedpe")
     else:
-        types=['CTCF ChIA-PET','POLR2 ChIA-PET','Hi-C']
-        for i in range(3):
+        types=['CTCF_ChIA-PET','POLR2_ChIA-PET','Hi-C']
+        for i in range(len(types)):
             for bin1 in range(out_cop.shape[-1]):
                 for bin2 in range(bin1, out_cop.shape[-1], 1):
-                    tmp = ['chr' + str(chrom), str(start + bin1 * interval), str(start + (bin1 + 1) * interval),
-                           'chr' + str(chrom),
-                           str(start + bin2 * interval), str(start + (bin2 + 1) * interval), '.',
-                           str(np.around(out_cop[i,bin1, bin2], 2)), '.', '.'
-                           ]
+                    tmp=['0','chr' + str(chrom), str(start + bin1 * interval),'0','0','chr' +str(chrom),str(start + bin2 * interval),'1',str(np.around(out_cop[i,bin1, bin2], 2))]
+
+                    # tmp = ['chr' + str(chrom), str(start + bin1 * interval), str(start + (bin1 + 1) * interval),
+                    #        'chr' + str(chrom),
+                    #        str(start + bin2 * interval), str(start + (bin2 + 1) * interval), '.',
+                    #        str(np.around(out_cop[i,bin1, bin2], 2)), '.', '.'
+                    #        ]
                     cop_lines.append('\t'.join(tmp) + '\n')
-            with open("tmps/browser_data/%s.bedpe"%types[i], 'w') as f:
+            with open(os.path.join(files_to_zip,"%s.bedpe"%types[i]), 'w') as f:
                 f.writelines(cop_lines)
-            out_zipfile.write("tmps/browser_data/%s.bedpe"%types[i])
-            os.remove("tmps/browser_data/%s.bedpe"%types[i])
+
+    out_zipfile = ZipFile("tmps/browser_data/tmp_%s-%s-%s.zip" % (chrom, start, end), "w", zipfile.ZIP_DEFLATED)
+    for file_to_zip in os.listdir(files_to_zip):
+        file_to_zip_full_path = os.path.join(files_to_zip, file_to_zip)
+        out_zipfile.write(filename=file_to_zip_full_path, arcname=file_to_zip)
 
     out_zipfile.close()
+    shutil.rmtree(files_to_zip)
     return "tmps/browser_data/tmp_%s-%s-%s.zip"%(chrom,start,end)
-
-
 
 
 

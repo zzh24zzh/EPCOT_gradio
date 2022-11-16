@@ -52,7 +52,7 @@ def predict_func(input_chrom, cop_type, input_region, input_file):
 
 def make_plots(in_file, maxv1, maxv2, epis):
     maxv1,maxv2=float(maxv1),float(maxv2)
-    with open(os.path.abspath('epigenomes.txt'), 'r') as f:
+    with open(os.path.abspath('examples/epigenomes.txt'), 'r') as f:
         epigenomes = f.read().splitlines()
     prediction = np.load(in_file.name)
     bins = prediction['cop'].shape[-1]

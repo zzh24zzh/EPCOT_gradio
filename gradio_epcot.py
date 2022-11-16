@@ -3,7 +3,7 @@ from func_gradio import predict_func,make_plots
 import os
 
 
-with open(os.path.abspath('epigenomes.txt'),'r') as f:
+with open(os.path.abspath('examples/epigenomes.txt'), 'r') as f:
     epis=f.read().splitlines()
 inputs = [
     gr.Dropdown([str(i) for i in range(1,23)],label='Choose a chromosome'),
