@@ -8,7 +8,7 @@
 git clone https://github.com/zzh24zzh/scEPCOT.git
 ```
 
-### Pre-processing input data
+### Pre-process input data
 Prepare the input ATAC-seq files
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
@@ -20,7 +20,6 @@ bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --no
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 ```
 
-
 Download and extract the processed input reference sequence
 ```
 !mkdir refSeq
@@ -29,7 +28,12 @@ Download and extract the processed input reference sequence
 ```
 
 
+### Run demo
 
+
+
+### Process prediction files
+The files of prediction results will appear under the folder 'tmps' after running the demo.
 
 Generate the Excel file and other supported files for [nuclesome browser](https://github.com/nucleome/nucleserver) from the prediction result files
 ```
