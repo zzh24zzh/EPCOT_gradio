@@ -23,6 +23,7 @@ python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 Download models, input reference genome sequence and example data
 ```
 #the files are downloaded under 'models', 'refSeq', and 'examples' folder. Add '-d' if not to download the reference sequnece 
+
 python download.py
 ```
 
