@@ -30,7 +30,9 @@ Download and extract the processed input reference sequence
 
 ### Run demo
 
-
+```
+python gradio_epcot.py
+```
 
 ### Process prediction files
 The files of prediction results will appear under the folder 'tmps' after running the demo.
