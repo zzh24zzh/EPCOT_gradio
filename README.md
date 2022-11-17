@@ -9,8 +9,7 @@
 git clone https://github.com/zzh24zzh/scEPCOT.git
 ```
 
-### Pre-process input data and download scEPCOT models
-Prepare the input ATAC-seq files
+### Prepare input ATAC-seq data 
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
 
@@ -21,7 +20,7 @@ bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --no
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 ```
 
-Download models, input reference genome sequence data
+### Download EPCOT models and input reference genome sequence data
 ```
 ###the files are downloaded under 'models' and 'refSeq' folders. Add '-d' if not to download the reference sequnece 
 python download.py
