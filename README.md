@@ -1,5 +1,6 @@
 # scEPCOT
 
+## Dependencies
 ## Usage
 
 ### Download source code
@@ -27,7 +28,7 @@ python download.py
 ```
 
 
-### Run demo
+### Run the demo
 
 ```
 python gradio_epcot.py
