@@ -38,6 +38,6 @@ The files of prediction results will appear under the folder 'tmps' after runnin
 
 Generate the Excel file and other supported files for [nuclesome browser](https://github.com/nucleome/nucleserver) from the prediction result files
 ```
-###usage: python makesheet,py -i <predictionFilesForBrowser> -o <outputFilename.xlsx>
+###usage: python makesheet,py -i <inputFilename> -o <outputFilename.xlsx>
 python makesheet.py -i tmps/browser_data/tmp_11-10550000-10950000.zip -o tmps/nb.xlsx
 ```
