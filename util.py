@@ -99,7 +99,7 @@ def generate_input(start,end,ref_genome,atac_seq):
     return np.stack(inputs)
 
 def search_tf(tf):
-    with open('examples/epigenomes.txt', 'r') as f:
+    with open('data/epigenomes.txt', 'r') as f:
         epigenomes = f.read().splitlines()
     tf_idx= epigenomes.index(tf)
     return tf_idx
@@ -221,7 +221,7 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
     import zipfile
     import shutil
     import uuid
-    with open('examples/epigenomes.txt', 'r') as f:
+    with open('data/epigenomes.txt', 'r') as f:
         epigenomes = f.read().splitlines()
 
     filename = str(uuid.uuid4())
@@ -231,7 +231,7 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
     os.mkdir(files_to_zip)
 
     hdr=[]
-    with open('examples/chrom_size_hg38.txt','r') as f:
+    with open('data/chrom_size_hg38.txt', 'r') as f:
         for line in f:
             tmp=line.strip().split('\t')
             hdr.append((tmp[0],int(tmp[1])))

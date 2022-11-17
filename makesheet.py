@@ -16,7 +16,7 @@ def parser_args():
 def bedpe2hic(filename,out_dir):
     res=1000 if filename.startswith('microc') else 5000
     tmp_file=os.path.join(out_dir,filename)
-    os.system('java -jar examples/juicer_tools.jar pre -n -r '+str(res)+
+    os.system('java -jar data/juicer_tools.jar pre -n -r '+str(res)+
               ' -d %s %s hg38'%(tmp_file,tmp_file.replace('.bedpe','.hic')))
 
 

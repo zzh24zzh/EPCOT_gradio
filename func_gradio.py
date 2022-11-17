@@ -8,16 +8,17 @@ from einops import rearrange
 from matplotlib.ticker import LinearLocator
 
 def predict_func(input_chrom, cop_type, input_region, input_file):
-
     if input_chrom == '' or cop_type == '':
-        raise ValueError("Please specify a genomic region")
-    if len(input_file) != 2:
-        raise ValueError("Please upload two files only, one for the reference genome and one for ATAC-seq")
+        raise ValueError("Please specify a genomic region of interest")
+    if input_file is None:
+        raise ValueError("Please provide an ATAC-seq file")
+    if not os.path.exists('refSeq/hg38/chr%s.npz'%input_chrom):
+        raise ValueError("Please download the processed reference genome")
+    # if len(input_file) != 2:
+    #     raise ValueError("Please upload two files only, one for the reference genome and one for ATAC-seq")
 
-    filea = load_npz(input_file[0]).toarray()
-    fileb = load_npz(input_file[1]).toarray()
-    ref_genome = filea if filea.shape[0] == 4 else fileb
-    atac_seq = filea if filea.shape[0] == 1 else fileb
+    ref_genome = load_npz('refSeq/hg38/chr%s.npz'%input_chrom).toarray()
+    atac_seq = load_npz(input_file.name).toarray()
 
     if cop_type == 'Micro-C (enter a 500 kb region)':
         chrom, start, end = check_region(input_chrom, input_region, ref_genome,500000)
@@ -48,10 +49,14 @@ def predict_func(input_chrom, cop_type, input_region, input_file):
 
 
 def make_plots(in_file, maxv1, maxv2, epis):
-    maxv1,maxv2=float(maxv1),float(maxv2)
-    with open(os.path.abspath('examples/epigenomes.txt'), 'r') as f:
-        epigenomes = f.read().splitlines()
+    import matplotlib
+    matplotlib.use("Agg")
+    # matplotlib.pyplot.switch_backend('Agg')
     prediction = np.load(in_file.name)
+    maxv1,maxv2=float(maxv1),float(maxv2)
+    with open(os.path.abspath('data/epigenomes.txt'), 'r') as f:
+        epigenomes = f.read().splitlines()
+
     bins = prediction['cop'].shape[-1]
     if epis=='':
         raise ValueError("Please choose epigenomic features to be visualized")

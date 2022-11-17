@@ -1,5 +1,4 @@
 import gdown,os,argparse
-
 def parser_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--downloadRefseq', '-d',default=True, action='store_false',
@@ -21,7 +20,8 @@ def download_refseq_hg38():
         os.mkdir('refSeq')
     gdown.download('https://drive.google.com/uc?id=1iqOKKNFwjl9hMZovxxhG-t_Y1MZw45R0',
                    output='refSeq/hg38.tar.gz')
-    os.system('tar -xvf refSeq/hg38.tar.gz -C refSeq/ hg38/chr11.npz')
+    os.system('tar -xvf refSeq/hg38.tar.gz -C refSeq/')
+    os.remove('refSeq/hg38.tar.gz')
 
 def main():
     args=parser_args()
