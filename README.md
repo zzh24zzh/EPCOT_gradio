@@ -21,9 +21,9 @@ bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --no
 python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
 ```
 
-Download models, input reference genome sequence and example data
+Download models, input reference genome sequence data
 ```
-###the files are downloaded under 'models', 'refSeq', and 'examples' folder. Add '-d' if not to download the reference sequnece 
+###the files are downloaded under 'models' and 'refSeq' folders. Add '-d' if not to download the reference sequnece 
 python download.py
 ```
 
