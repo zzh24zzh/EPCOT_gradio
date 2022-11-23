@@ -42,21 +42,15 @@ class Tranmodel(nn.Module):
 
     def forward(self, input):
         src = self.backbone(input)
-        label_inputs=self.label_input.repeat(src.size(0),1).cuda()
+        label_inputs=self.label_input.repeat(src.size(0),1).to(input.device)
         label_embed=self.query_embed(label_inputs)
         src=self.input_proj(src)
         hs = self.transformer(src, label_embed)
         out = self.fc(hs)
         return out
 
-def build_backbone(args):
+def build_backbone():
     model = CNN()
-    if args.load_backbone:
-        # load trained backbone
-        model_path='/nfs/turbo/umms-drjieliu/usr/zzh/KGbert/experiment/models/checkpoint1_cnn1_dnase_norm.pt'
-        print(model_path)
-        # model_path='models/backbone_%s.pt'%args.ac_data
-        model.load_state_dict(torch.load(model_path, map_location='cpu'))
     return model
 def build_transformer(args):
     return Transformer(
@@ -67,8 +61,8 @@ def build_transformer(args):
         num_encoder_layers=args.enc_layers,
         num_decoder_layers=args.dec_layers
     )
-def build_model(args):
-    backbone = build_backbone(args)
+def build_epd_model(args):
+    backbone = build_backbone()
     transformer = build_transformer(args)
     model = Tranmodel(
             backbone=backbone,

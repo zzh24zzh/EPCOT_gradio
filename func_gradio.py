@@ -1,11 +1,9 @@
 import numpy as np
 import torch,os
-from util import check_region,predict_microc,predict_cage,predict_epis,filetobrowser,predict_hic
+from util import check_region,predict_microc,predict_cage,predict_epis,filetobrowser,predict_hic,predict_epb
 from scipy.sparse import load_npz
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
-from einops import rearrange
-from matplotlib.ticker import LinearLocator
 
 def predict_func(input_chrom, cop_type, input_region, input_file):
     if input_chrom == '' or cop_type == '':
@@ -27,28 +25,29 @@ def predict_func(input_chrom, cop_type, input_region, input_file):
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
-    out_cage = predict_cage(os.path.abspath('models/cage.pt'), [start, end], ref_genome, atac_seq, device,cop_type)
+    out_epi_binding = predict_epb(os.path.abspath('models/epi_bind.pt'), [start, end], ref_genome, atac_seq, device,
+                               cop_type)
+    out_cage = predict_cage(os.path.abspath('models/cage.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
 
-    out_epi = predict_epis(os.path.abspath('models/epi_track.pt'), [start, end], ref_genome, atac_seq, device,cop_type)
-    out_epi = rearrange(out_epi, 'i j k -> (i j) k')
+    out_epi = predict_epis(os.path.abspath('models/epi_track.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
 
     if cop_type == 'Micro-C (enter a 500 kb region)':
-        out_cop = predict_microc(os.path.abspath('models/microc.pt'), [start, end], ref_genome, atac_seq, device)[40:-40,40:-40]
-        np.savez_compressed( 'tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+50000,end-50000), epi=out_epi, cage=out_cage,
+        out_cop = predict_microc(os.path.abspath('models/microc.pt'), [start, end], ref_genome, atac_seq, device)
+        np.savez_compressed( 'tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+10000,end-10000),epb=out_epi_binding, epi=out_epi, cage=out_cage,
                             cop=out_cop)
-        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+50000,end-50000),
-                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+50000,end-50000)]
+        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+10000,end-10000),
+                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+10000,end-10000)]
     else:
-        out_cop=predict_hic(os.path.abspath('models/hic.pt'), [start, end], ref_genome, atac_seq, device)[:,16:-16,16:-16]
-        np.savez_compressed('tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 100000, end - 100000), epi=out_epi,
+        out_cop=predict_hic(os.path.abspath('models/hic.pt'), [start, end], ref_genome, atac_seq, device)
+        np.savez_compressed('tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 20000, end - 20000),epb=out_epi_binding, epi=out_epi,
                             cage=out_cage,
                             cop=out_cop)
 
-        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 100000, end - 100000),
-                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 100000, end - 100000)]
+        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 20000, end - 20000),
+                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 20000, end - 20000)]
 
 
-def make_plots(in_file, maxv1, maxv2, epis):
+def make_plots(in_file,modal, maxv1, maxv2, epis):
     import matplotlib
     matplotlib.use("Agg")
     # matplotlib.pyplot.switch_backend('Agg')
@@ -68,7 +67,7 @@ def make_plots(in_file, maxv1, maxv2, epis):
     plt.rcParams['font.family'] = 'sans-serif'
     plt.rcParams['font.size'] = 14
 
-    if bins==400:
+    if bins==480:
         fig = plt.figure(figsize=(9, num_mod + 4))
         gs = GridSpec(num_mod+4, 9)
         ax_map = [fig.add_subplot(gs[:4, :8])]
@@ -85,7 +84,7 @@ def make_plots(in_file, maxv1, maxv2, epis):
         axc1.axis('off')
         axs = [fig.add_subplot(gs[12 + i, :8]) for i in range(num_mod)]
 
-    if bins == 400:
+    if bins == 480:
         bin_coords = np.true_divide(np.arange(bins), np.sqrt(2))
         x, y = np.meshgrid(bin_coords, bin_coords)
         sin45 = np.sin(np.radians(45))
@@ -119,13 +118,21 @@ def make_plots(in_file, maxv1, maxv2, epis):
         axm.spines['right'].set_visible(False)
         axm.spines['bottom'].set_visible(False)
     for i in range(num_mod-1):
-        axs[i].fill_between(np.arange(prediction['epi'].shape[0]), 0, prediction['epi'][:,epi_idx[i]])
-        axs[i].set_ylim(0, maxv2)
-        axs[i].text(2, maxv2, epis[i],va='top')
+        if modal=='tracks':
+            axs[i].fill_between(np.arange(prediction['epi'].shape[0]), 0, prediction['epi'][:,epi_idx[i]])
+            axs[i].set_ylim(0, maxv2)
+            axs[i].text(2, maxv2, epis[i],va='top')
+        else:
+            axs[i].fill_between(np.arange(prediction['epb'].shape[0]), 0, prediction['epb'][:, epi_idx[i]])
+            axs[i].set_ylim(0, 1)
+            axs[i].text(2, 1, epis[i], va='top')
+
     start=int(in_file.name.split('-')[1])
     chrom=int(in_file.name.split('prediction_')[1].split('-')[0])
-    end= start+400000 if bins==400 else start + 800000
-    seq_inter=1000 if bins==400 else 5000
+    end= start+480000 if bins==480 else start + 960000
+    seq_inter=1000 if bins==480 else 5000
+    # tmp_cage=prediction['cage'].flatten().squeeze()
+    # print(prediction['cage'].shape,tmp_cage.shape)
     axs[-1].fill_between(np.arange(prediction['cage'].shape[0]), 0, prediction['cage'])
     axs[-1].set_ylim(0, 8)
     axs[-1].text(2, 8, 'CAGE',va='top')

@@ -1,11 +1,12 @@
 import argparse
 import numpy as np
 import torch
+from pretrain.model import build_epd_model
 from pretrain.track.model import build_track_model
 from cage.model import build_cage_model
 from cop.micro_model import build_microc_model
 from cop.hic_model import build_hic_model
-
+from einops import rearrange
 
 
 
@@ -37,7 +38,7 @@ def parser_args_epi(parent_parser):
     """
     parser=argparse.ArgumentParser(parents=[parent_parser],add_help = False)
     parser.add_argument('--bins', type=int, default=500)
-    parser.add_argument('--crop', type=int, default=50)
+    parser.add_argument('--crop', type=int, default=10)
     parser.add_argument('--embed_dim', default=768, type=int)
     parser.add_argument('--return_embed', default=False, action='store_true')
     args, unknown = parser.parse_known_args()
@@ -48,9 +49,10 @@ def parser_args_cage(parent_parser):
     Hyperparameters for the downstream model to predict 1kb-resolution CAGE-seq
     """
     parser=argparse.ArgumentParser(parents=[parent_parser],add_help = False)
-    parser.add_argument('--bins', type=int, default=250)
-    parser.add_argument('--crop', type=int, default=25)
-    parser.add_argument('--embed_dim', default=360, type=int)
+    parser.add_argument('--bins', type=int, default=500)
+    parser.add_argument('--crop', type=int, default=10)
+    parser.add_argument('--embed_dim', default=768, type=int)
+    parser.add_argument('--return_embed', default=True, action='store_false')
     args, unknown = parser.parse_known_args()
     return args
 
@@ -91,12 +93,20 @@ def check_region(chrom,region,ref_genome,region_len):
     return int(chrom),start,end
 
 def generate_input(start,end,ref_genome,atac_seq):
-    inputs=[]
-    for loc in range(start,end,1000):
-        tmp_seq = ref_genome[:, loc - 300:loc + 1300]
-        tmp_atac = atac_seq[:, loc - 300:loc + 1300]
-        inputs.append(np.vstack([tmp_seq,tmp_atac]))
-    return np.stack(inputs)
+    # inputs=[]
+    pad_left=np.expand_dims(np.vstack((ref_genome[:,start-300:start],atac_seq[:,start-300:start])),0)
+    pad_right=np.expand_dims(np.vstack((ref_genome[:,end:end+300],atac_seq[:,end:end+300])),0)
+    center=np.vstack((ref_genome[:,start:end],atac_seq[:,start:end]))
+    center=rearrange(center,'n (b l)-> b n l',l=1000)
+    dmatrix = np.concatenate((pad_left, center[:, :, -300:]), axis=0)[:-1, :, :]
+    umatrix = np.concatenate((center[:, :, :300], pad_right), axis=0)[1:, :, :]
+    return np.concatenate((dmatrix, center, umatrix), axis=2)
+
+    # for loc in range(start,end,1000):
+    #     tmp_seq = ref_genome[:, loc - 300:loc + 1300]
+    #     tmp_atac = atac_seq[:, loc - 300:loc + 1300]
+    #     inputs.append(np.vstack([tmp_seq,tmp_atac]))
+    # return np.stack(inputs)
 
 def search_tf(tf):
     with open('data/epigenomes.txt', 'r') as f:
@@ -106,7 +116,27 @@ def search_tf(tf):
 
 
 
+def predict_epb(
+        model_path,
+        region, ref_genome,atac_seq,
+        device,
+        cop_type
+):
+    args, parser = get_args()
 
+    pretrain_model = build_epd_model(args)
+    pretrain_model.load_state_dict(torch.load(model_path,map_location=torch.device(device)))
+    pretrain_model.eval()
+    pretrain_model.to(device)
+    start,end=region
+    inputs=generate_input(start,end,ref_genome,atac_seq)
+    inputs=torch.tensor(inputs).float().to(device)
+    with torch.no_grad():
+        pred_epi=torch.sigmoid(pretrain_model(inputs)).numpy()
+    if cop_type == 'Micro-C (enter a 500 kb region)':
+        return pred_epi[10:-10,:]
+    else:
+        return pred_epi[20:-20,:]
 
 
 def predict_epis(
@@ -126,15 +156,17 @@ def predict_epis(
     if cop_type == 'Micro-C (enter a 500 kb region)':
         inputs.append(generate_input(start,end,ref_genome,atac_seq))
     else:
-        for loc in range(start+100000,end-100000,400000):
-            inputs.append(generate_input(loc-50000,loc+450000,ref_genome,atac_seq))
+        for loc in range(start+20000,end-20000,480000):
+            inputs.append(generate_input(loc-10000,loc+490000,ref_genome,atac_seq))
     inputs=np.stack(inputs)
     inputs=torch.tensor(inputs).float().to(device)
     pred_epi=[]
     with torch.no_grad():
         for i in range(inputs.shape[0]):
             pred_epi.append(pretrain_model(inputs[i:i+1]).detach().cpu().numpy())
-    return np.vstack(pred_epi)
+
+    out_epi = rearrange(np.vstack(pred_epi), 'i j k -> (i j) k')
+    return out_epi
 
 def predict_cage(
         model_path,
@@ -151,18 +183,33 @@ def predict_cage(
     inputs = []
     start, end = region
     if cop_type == 'Micro-C (enter a 500 kb region)':
-        for loc in range(start + 50000, end - 50000, 200000):
-            inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+        inputs.append(generate_input(start, end, ref_genome, atac_seq))
     else:
-        for loc in range(start + 100000, end - 100000, 200000):
-            inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+        for loc in range(start + 20000, end - 20000, 480000):
+            inputs.append(generate_input(loc - 10000, loc + 490000, ref_genome, atac_seq))
     inputs = np.stack(inputs)
     inputs = torch.tensor(inputs).float().to(device)
-    pred_cage=[]
+    pred_cage = []
     with torch.no_grad():
         for i in range(inputs.shape[0]):
             pred_cage.append(cage_model(inputs[i:i + 1]).detach().cpu().numpy().squeeze())
     return np.concatenate(pred_cage)
+
+    # inputs = []
+    # start, end = region
+    # if cop_type == 'Micro-C (enter a 500 kb region)':
+    #     for loc in range(start + 50000, end - 50000, 200000):
+    #         inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+    # else:
+    #     for loc in range(start + 100000, end - 100000, 200000):
+    #         inputs.append(generate_input(loc - 25000, loc + 225000, ref_genome, atac_seq))
+    # inputs = np.stack(inputs)
+    # inputs = torch.tensor(inputs).float().to(device)
+    # pred_cage=[]
+    # with torch.no_grad():
+    #     for i in range(inputs.shape[0]):
+    #         pred_cage.append(cage_model(inputs[i:i + 1]).detach().cpu().numpy().squeeze())
+    # return np.concatenate(pred_cage)
 
 def arraytouptri(arrays,args):
     effective_lens=args.bins-2*args.crop
@@ -235,7 +282,7 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
         for line in f:
             tmp=line.strip().split('\t')
             hdr.append((tmp[0],int(tmp[1])))
-        # bwOutput.addHeader([('chr18', 80373285)])
+
 
     for i in range(out_epis.shape[1]):
         bwfile = pyBigWig.open(os.path.join(files_to_zip,"%s.bigWig"%epigenomes[i]), 'w')
@@ -251,8 +298,8 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
     bwfile.close()
     cop_lines=[]
 
-    interval=1000 if out_cop.shape[-1]==400 else 5000
-    if out_cop.shape[-1]==400:
+    interval=1000 if out_cop.shape[-1]==480 else 5000
+    if out_cop.shape[-1]==480:
         for bin1 in range(out_cop.shape[-1]):
             for bin2 in range(bin1,out_cop.shape[-1],1):
                 # tmp=['chr' + str(chrom),str(start+bin1*interval),str(start+(bin1+1)*interval),'chr' + str(chrom),

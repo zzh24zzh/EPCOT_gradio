@@ -16,7 +16,6 @@ class CNN(nn.Module):
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.1),
             nn.Conv1d(256, 256, kernel_size=conv_kernel_size1),
-            # nn.GroupNorm(16, 256),
             nn.BatchNorm1d(256),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=pool_kernel_size1, stride=pool_kernel_size1),
@@ -26,7 +25,6 @@ class CNN(nn.Module):
             nn.Dropout(p=0.1),
             nn.Conv1d(360, 360, kernel_size=conv_kernel_size2),
             nn.BatchNorm1d(360),
-            # nn.GroupNorm(36, 360),
             nn.ReLU(inplace=True),
             nn.MaxPool1d(kernel_size=pool_kernel_size2, stride=pool_kernel_size2),
             nn.Dropout(p=0.1),
@@ -35,7 +33,6 @@ class CNN(nn.Module):
             nn.Dropout(p=0.2),
             nn.Conv1d(512, 512, kernel_size=conv_kernel_size2),
             nn.BatchNorm1d(512),
-            # nn.GroupNorm(32, 512),
             nn.ReLU(inplace=True),
             nn.Dropout(p=0.2))
         self.num_channels = 512

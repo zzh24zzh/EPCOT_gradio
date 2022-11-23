@@ -33,6 +33,7 @@ app1 = gr.Interface(
 
 inputs = [
     gr.File(label="Upload the prediction files for visualization"),
+    gr.Dropdown(["binding activity","tracks"],label="Choose to plot epigenomic feature binary binding activities or tracks",value='tracks'),
     gr.Slider(maximum=16,label="Range of contact map values",value=6),
     gr.Slider(maximum=10,label="Range of epigenomic feature track values",value=6),
     gr.CheckboxGroup(epis,label='Choose epigenomes to be visualized'),
@@ -44,8 +45,8 @@ app2 = gr.Interface(
     inputs=inputs,
     outputs=outputs,
     examples=[
-        [os.path.join(os.path.dirname(__file__), "data/GM12878_prediction_11-10550000-10950000.npz"), "6", "6", ["CTCF", "H3K4me3"]],
-         [os.path.join(os.path.dirname(__file__), "data/prediction_11-7850000-8650000.npz"), "3", "6", ["CTCF", "POLR2A", "H3K4me3"]],
+        [os.path.join(os.path.dirname(__file__), "examples/GM12878_prediction_11-10550000-10950000.npz"),'tracks', "6", "6", ["CTCF", "H3K4me3"]],
+         [os.path.join(os.path.dirname(__file__), "examples/prediction_11-7850000-8650000.npz"),'tracks', "3", "6", ["CTCF", "POLR2A", "H3K4me3"]],
     ],
 )
 demo = gr.TabbedInterface([app1, app2], ["Modality prediction", "Prediction visualization"])
