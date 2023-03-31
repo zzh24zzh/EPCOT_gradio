@@ -6,7 +6,7 @@
 ### Download source code
 
 ```
-git clone https://github.com/zzh24zzh/scEPCOT.git
+git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
 ### Prepare input ATAC-seq data 
