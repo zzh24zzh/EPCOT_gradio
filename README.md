@@ -1,4 +1,4 @@
-# scEPCOT
+# EPCOT Gradio
 
 ## Dependencies
 ## Usage
