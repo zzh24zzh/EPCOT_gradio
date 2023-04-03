@@ -1,4 +1,4 @@
-# EPCOT Gradio
+# EPCOT Gradio demo
 
 ## Dependencies
 
