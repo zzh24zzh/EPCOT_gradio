@@ -31,14 +31,14 @@ python download.py
 
 ### Step 3: Prepare input ATAC-seq data (process_atac.py)
 #### Input
-* an ATAC-seq profile in **.bam** format
-* the number of processors used in bamConverage function
+* An ATAC-seq profile in **.bam** format
+* The number of processors to use in deepTools's bamCoverage
 
 #### Output
-* processed ATAC-seq file in **.npz** format, which can be uploaded to the demo to excute models
+* A processed ATAC-seq file in **.npz** format, which can be uploaded to the demo to excute models
 
 
-Required packages: deepTools, samtools
+Install required packages: deepTools, samtools
 ```
 python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 ```
