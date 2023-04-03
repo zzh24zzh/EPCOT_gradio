@@ -17,6 +17,8 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 ## Usage
 
+Follow these steps to run the demo locally:
+
 ### Step 1: Clone the repository
 
 ```
