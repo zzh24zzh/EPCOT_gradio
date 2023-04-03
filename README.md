@@ -11,6 +11,8 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 * deepTools-3.5.1
 
+* gradio-3.24.1
+
 * samtools-1.16.1
 
 ## Usage
