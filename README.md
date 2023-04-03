@@ -1,5 +1,12 @@
 # EPCOT Gradio demo
 
+
+Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin contact maps with an easy-to-use Gradio interface.
+
+## Prerequisites
+
+
+
 ## Dependencies
 
 * deepTools-3.5.1
@@ -28,7 +35,7 @@ python download.py
 * the number of processors used in bamConverage function
 
 #### Output
-* processed ATAC-seq file in **.npz** format
+* processed ATAC-seq file in **.npz** format, which can be uploaded to the demo to excute models
 
 
 Required packages: deepTools, samtools
@@ -38,7 +45,7 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 
 
 
-### Step 4: Run the demo
+### Step 4: Run Gradio demo to excute models
 
 ```
 python gradio_epcot.py
