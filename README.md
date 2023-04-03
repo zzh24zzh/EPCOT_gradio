@@ -26,11 +26,6 @@ Required packages: deepTools, samtools
 python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 ```
 
-### Download EPCOT models and input reference genome sequence data
-```
-###the files are downloaded under 'models' and 'refSeq' folders. Add '-d' if not to download the reference sequnece 
-python download.py
-```
 
 
 ### Run the demo
