@@ -28,7 +28,7 @@ python download.py
 * the number of processors used in bamConverage function
 
 #### Output
-* processed ATAC-seq file in .npz format
+* processed ATAC-seq file in **.npz** format
 
 
 Required packages: deepTools, samtools
