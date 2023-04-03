@@ -10,13 +10,13 @@
 
 ### Step 1: Download source code
 
-```
+```bash
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
 ### Step 2: Download trained models and reference genome data
 
-The trained models will be downloaded to "models/", the reference sequence data is downloaded to "refSeq/" 
+The pre-trained models will be downloaded to the "models/" directory, and the reference sequence data will be downloaded to the "refSeq/" directory. 
 ```
 python download.py
 ```
