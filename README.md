@@ -5,7 +5,7 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 ## Prerequisites
 
-
+* Python-3.9.12
 
 ## Dependencies
 
