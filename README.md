@@ -28,7 +28,7 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 
 
 
-### Run the demo
+### Step 4: Run the demo
 
 ```
 python gradio_epcot.py
