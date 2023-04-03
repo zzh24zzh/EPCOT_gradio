@@ -1,26 +1,29 @@
 # EPCOT Gradio
 
 ## Dependencies
+
 deepTools-3.5.1
+
 samtools-1.16.1
+
 ## Usage
 
-### Step 1: download source code
+### Step 1: Download source code
 
 ```
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
-### Prepare input ATAC-seq data 
+### Step 2: Download trained models and reference genome data
+
+```
+python download.py
+```
+
+### Step 3: Prepare input ATAC-seq data 
 Required packages: deepTools, samtools
 ```
-wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
-
-bamCoverage --bam GM12878.bam -o GM12878_atac.bigWig --outFileFormat bigwig --normalizeUsing RPGC --effectiveGenomeSize 2913022398 
---Offset 1 --binSize 1 --numberOfProcessors 12 --blackListFileName /scratch/drjieliu_root/drjieliu/zhenhaoz/ATAC-seq/bam/black_list.bed
-
-###usage: python process_atac.py -i <bigWig_file> -p <prefix> -o <output_directory>
-python process_atac.py -i GM12878_atac.bigWig -p GM12878 -o atacseq/
+python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 ```
 
 ### Download EPCOT models and input reference genome sequence data
