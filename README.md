@@ -8,9 +8,9 @@
 
 ## Usage
 
-### Step 1: Download source code
+### Step 1: Clone the repository
 
-```bash
+```
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
