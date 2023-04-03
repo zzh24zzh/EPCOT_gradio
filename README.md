@@ -2,9 +2,9 @@
 
 ## Dependencies
 
-deepTools-3.5.1
+* deepTools-3.5.1
 
-samtools-1.16.1
+* samtools-1.16.1
 
 ## Usage
 
