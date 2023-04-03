@@ -1,6 +1,8 @@
 # EPCOT Gradio
 
 ## Dependencies
+deepTools-3.5.1
+samtools-1.16.1
 ## Usage
 
 ### Step 1: download source code
@@ -10,7 +12,7 @@ git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
 ### Prepare input ATAC-seq data 
-required packages: deepTools-3.5.1, samtools-1.16.1
+Required packages: deepTools, samtools
 ```
 wget -O - https://www.encodeproject.org/files/ENCFF356LFX/@@download/ENCFF356LFX.bed.gz| gunzip -c > black_list.bed
 
