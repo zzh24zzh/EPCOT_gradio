@@ -16,9 +16,11 @@ git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 
 ### Step 2: Download trained models and reference genome data
 
+The trained models will be downloaded to "models/", the reference sequence data is downloaded to "refSeq/" 
 ```
 python download.py
 ```
+
 
 ### Step 3: Prepare input ATAC-seq data 
 Required packages: deepTools, samtools
@@ -33,6 +35,7 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 ```
 python gradio_epcot.py
 ```
+
 
 ### Process prediction files
 The files of prediction results will appear under the folder 'tmps' after running the demo.
