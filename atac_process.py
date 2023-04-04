@@ -31,8 +31,8 @@ def atac_bwtonpz(atac_file):
 
         seq_length = length // 1000 * 1000
         signals[chr] = csr_matrix(temp.astype('float32')[:seq_length])
-    np.savez(atac_file.replace('bigWig','npz'), **{name: value for name, value in signals.items()})
-    print('the processed ATAC-seq file has been saved to '+os.path.abspath(atac_file.replace('bigWig','npz')))
+    np.savez('atac_'+atac_file.replace('bigWig','npz'), **{name: value for name, value in signals.items()})
+    print('the processed ATAC-seq file has been saved to '+os.path.abspath('atac_'+atac_file.replace('bigWig','npz')))
 
 
 def main():
@@ -43,8 +43,7 @@ def main():
     os.system('bamCoverage --bam %s -o %s --outFileFormat bigwig --normalizeUsing RPGC '
               '--effectiveGenomeSize 2913022398 --Offset 1 --binSize 1 --numberOfProcessors %s '
               '--blackListFileName data/black_list.bed'%(args.bam,fid+'.bigWig',args.num_processers))
-
-
+    atac_bwtonpz(fid+'.bigWig')
 if __name__=="__main__":
     main()
 
