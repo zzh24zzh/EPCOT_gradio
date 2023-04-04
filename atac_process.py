@@ -42,7 +42,7 @@ def main():
     os.system('samtools index %s'%args.bam)
     os.system('bamCoverage --bam %s -o %s --outFileFormat bigwig --normalizeUsing RPGC '
               '--effectiveGenomeSize 2913022398 --Offset 1 --binSize 1 --numberOfProcessors %s '
-              '--blackListFileName examples/black_list.bed'%(args.bam,fid+'.bigWig',args.num_processers))
+              '--blackListFileName data/black_list.bed'%(args.bam,fid+'.bigWig',args.num_processers))
 
 
 if __name__=="__main__":
