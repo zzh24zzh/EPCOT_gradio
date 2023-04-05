@@ -131,7 +131,7 @@ def predict_epb(
     inputs=generate_input(start,end,ref_genome,atac_seq)
     inputs=torch.tensor(inputs).float().to(device)
     with torch.no_grad():
-        pred_epi=torch.sigmoid(pretrain_model(inputs)).numpy()
+        pred_epi=torch.sigmoid(pretrain_model(inputs)).detach().cpu().numpy()
     if cop_type == 'Micro-C (enter a 500 kb region)':
         return pred_epi[10:-10,:]
     else:
