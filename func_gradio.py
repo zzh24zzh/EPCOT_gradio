@@ -15,7 +15,7 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
         raise gradio.Error("The reference genome must be downloaded!")
 
     ref_genome = load_npz('refSeq/hg38/chr%s.npz'%input_chrom).toarray()
-
+    print(atac_seq.name)
     try:
         with open(atac_seq.name,'rb') as f:
             tmp_atac=pickle.load(f)
