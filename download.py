@@ -11,10 +11,11 @@ def download_models():
     gdown.download_folder('https://drive.google.com/drive/u/1/folders/1oqrRToBfzjfkDoQzy8SGRY1x2qGhAwj1')
 
 def download_examples():
-    gdown.download('https://drive.google.com/uc?id=1QW4hVjgxZZeQYXO0XyWhALhLyy-fEpPP',output='examples/chr11.npz')
-    gdown.download('https://drive.google.com/uc?id=1EZ-gE2Gs2hRpNIali1dSOijOkXYqx4Sv',
-                   output='examples/GM12878_atac_chr11.npz')
-
+    if not os.path.exists('examples'):
+        os.mkdir('examples')
+    gdown.download('https://drive.google.com/uc?id=1IF_PLWpTpr-Q3iyUqrWN6FKYZ6j-1V2c',output='examples/atac_GM12878.pickle')
+    # gdown.download('https://drive.google.com/uc?id=1EZ-gE2Gs2hRpNIali1dSOijOkXYqx4Sv',
+    #                output='examples/GM12878_atac_chr11.npz')
 def download_refseq_hg38():
     if not os.path.exists('refSeq'):
         os.mkdir('refSeq')
