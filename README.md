@@ -13,7 +13,7 @@ The demo includes two interfaces: (1) to run the model, and (2) to visualize pre
 
 Follow these steps to run the demo locally:
 
-####  1. Clone the repository and install required packages
+####  1. Clone the repository
 
 ```
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
