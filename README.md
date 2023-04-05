@@ -11,6 +11,7 @@ The demo includes two interfaces: (1) to run the model, and (2) to visualize pre
 
 ## Usage
 
+
 Follow these steps to run the demo locally:
 
 ####  1. Clone the repository
