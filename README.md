@@ -51,3 +51,13 @@ python gradio_epcot.py
 ```
 
 After completing these steps, you will be able to use the Gradio interface to run the EPCOT model on your ATAC-seq data and visualize the results.
+
+The predicted modalities include:
+
+| Data       | Standard |
+| ----------- | ----------- |
+| ChIP-seq (245 epigenomic features)      | arcsinh-transformed signal p-values     |
+| CAGE-seq   | log2(x+1)-transformed signal |
+| Micro-C   | Observed over expectation count ratio|
+| Hi-C| Observed over expectation count ratio|
+| ChIP-PET| log2(x+1)-transformed observed over expectation count ratio|
