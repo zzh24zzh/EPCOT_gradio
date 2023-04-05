@@ -11,7 +11,7 @@ The demo includes two interfaces: (1) to run the model, and (2) to visualize pre
 
 ## Usage
 
-The demo can be deployed on a Google Colab notebook where GPUs can accelerate the model execution. Click [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zzh24zzh/EPCOT_gradio/blob/main/gradio.ipynb) to open the example:
+The demo can be deployed on a Google Colab notebook where GPUs can accelerate the model execution. Click [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/zzh24zzh/EPCOT_gradio/blob/main/gradio.ipynb) to open the example.
 
 To run the demo locally, follow these steps:
 
