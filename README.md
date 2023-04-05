@@ -45,7 +45,7 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 
 
 
-### Step 4: Run Gradio demo to excute models
+### Step 4: Run Gradio demo
 
 ```
 python gradio_epcot.py
