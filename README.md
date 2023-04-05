@@ -2,7 +2,7 @@
 
 Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin contact maps with an easy-to-use Gradio interface.
 
-The demo includes two interfaces to (1) run model and (2) visualize prediction results. The only file required from users is a ATAC-seq profile which can be processed from a .bam file by running the script [atac_process.py](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/atac_process.py).
+The demo includes two interfaces: (1) to run the model, and (2) to visualize prediction results. Users only need to provide a processed ATAC-seq file, which can be generated from a .bam file using the provided script [atac_process.py](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/atac_process.py) (see step 3 in Usage).
 
 ## Prerequisites
 
@@ -52,3 +52,4 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 python gradio_epcot.py
 ```
 
+After completing these steps, you will be able to use the Gradio interface to run the EPCOT model on your ATAC-seq data and visualize the results.
