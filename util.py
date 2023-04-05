@@ -7,7 +7,7 @@ from cage.model import build_cage_model
 from cop.micro_model import build_microc_model
 from cop.hic_model import build_hic_model
 from einops import rearrange
-
+import gradio
 
 
 
@@ -85,10 +85,13 @@ def parser_args_microc(parent_parser):
 def check_region(chrom,start,end,ref_genome,region_len):
     start,end=int(start),int(end)
     if end-start != region_len:
-        raise ValueError("Please enter a region with the correct length")
+        if region_len==500000:
+            raise gradio.Error("Please enter a 500kb region!")
+        else:
+            raise gradio.Error("Please enter a 1Mb region!")
     if start<300 or end > ref_genome.shape[1]-300:
-        raise ValueError("The start of input region should be greater than 300 and "
-                         "the end of the region should be less than %s"%(ref_genome.shape[1]-300))
+        raise gradio.Error("The start of input region should be greater than 300 and "
+                         "the end of the region should be less than %s!"%(ref_genome.shape[1]-300))
     return int(chrom),start,end
 
 def generate_input(start,end,ref_genome,atac_seq):

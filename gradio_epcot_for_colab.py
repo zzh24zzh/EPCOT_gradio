@@ -1,23 +1,25 @@
 import gradio as gr
 import os
-from func_gradio import predict_func,make_plots
+from func_gradio import predict_func_for_colab,make_plots
 
 inputs = [
-    gr.Dropdown([str(i) for i in range(1, 23)], label='Chromosome', default='1'),
+    gr.Dropdown([str(i) for i in range(1,23)],label='Chromosome',default='1'),
     gr.Dropdown(['Micro-C', 'Hi-C (ChIA-PET)']
-                , label='Chromatin contact map', info='One type of contact map is predicted for each time'),
-    gr.Number(label='Region of interest (500kb for Micro-C and 1Mb for Hi-C)', info='From'),
-    gr.Number(info='To', show_label=False),
-    gr.File(label='Processed ATAC-seq file (in .pickle format)'),
-
+                ,label='Chromatin contact map', info='One type of contact map is predicted for each time'),
+    gr.Number(label='Region of interest (500kb for Micro-C and 1Mb for Hi-C)',info='From'),
+    gr.Number(info='To',show_label=False),
+    gr.Textbox(
+            label="ATAC-seq file",
+            info="Path to the processed ATAC-seq file",
+            lines=1,
+            # value="examples/atac_GM12878.pickle",
+        ),
 ]
-
 outputs = [
     gr.Files(label='Download the results'),
 ]
-
 app1 = gr.Interface(
-    fn=predict_func,
+    fn=predict_func_for_colab,
     inputs=inputs,
     outputs=outputs,
     title='A computational tool to use ATAC-seq to impute epigenome, transcriptome, and high-resolution chromatin contact maps',
@@ -25,9 +27,7 @@ app1 = gr.Interface(
     description='<a href="https://github.com/zzh24zzh/EPCOT_gradio" class="built-with svelte-1lyswbr" target="_blank" '
                 'style="font-size: 15px; font-color: black; font-weight:bold" rel="noreferrer">'
                 'View Documentation </a>',
-
-    examples=[["11","Micro-C","10500000","11000000","examples/atac_GM12878.pickle"],
-        ["11","Hi-C (ChIA-PET)","7750000","8750000","examples/atac_GM12878.pickle"]]
+    # examples=[["11","Micro-C","10500000","11000000","examples/atac_GM12878.pickle"]]
 )
 
 
@@ -53,18 +53,6 @@ app2 = gr.Interface(
 )
 
 demo = gr.TabbedInterface([app1, app2], ["Run model", "Visualize prediction results"],
-                          css=".gradio-container-3-24-1 {font-weight:bold}"
-                              "h1 {font-family: verdana; color:grey} div {border-color: black}"
-                                ".selected.svelte-1g805jl {border-color: white;border-width:2.5px; font-weight:bold;border-bottom-width:1px} "
-                              ".tab-nav.svelte-1g805jl{border-bottom-color: white;border-bottom-width:2.5px}"
-                              "div.tabitem {border-color: white;border-width:2.5px}" 
-                              "button.svelte-1g805jl{font-weight:bold}"
-                              "body{background-color: white;}"
-                ".gradio-container{background-color: #e5e5f7;"
-                          "background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #e5e5f7 10px ),"
-                          " repeating-linear-gradient(#fffcdc,#d9a7c7) ",
                           theme=gr.themes.Soft())
-
-
-if __name__ == "__main__":
+if __name__=='__main__':
     demo.launch(debug=True)
