@@ -8,17 +8,12 @@ inputs = [
                 ,label='Choose a type of chromatin contact maps to be predicted', info='One contact map type is predicted for each time'),
     gr.Number(label='Enter a 500kb genomic region if Hi-C is selected, or a 1Mb genomic region if Micro-C is selected.',info='From'),
     gr.Number(info='To',show_label=False),
-    gr.File(label='Upload or Drop the processed ATAC-seq file (in **.pickle** format)'),
-    # gr.Examples(["11","Micro-C","10500000","11000000",
-    #       os.path.join(os.path.dirname(__file__),"atac_36edf5f4-8824-4e1d-b031-451c5df505f0.pickle")])
-
+    gr.File(label='Upload or Drop the processed ATAC-seq file (in .pickle format)'),
 ]
 
 outputs = [
     gr.Files(label='Download the prediction results once model running is completed.'),
 ]
-
-
 
 app1 = gr.Interface(
     fn=predict_func,
@@ -29,7 +24,6 @@ app1 = gr.Interface(
     description='<a href="https://github.com/zzh24zzh/EPCOT_gradio" class="built-with svelte-1lyswbr" target="_blank" '
                 'style="font-size: 15px; font-color: black; font-weight:bold" rel="noreferrer">'
                 'View Documentation </a>',
-    interpretation='explain',
 )
 
 
@@ -70,4 +64,4 @@ demo = gr.TabbedInterface([app1, app2], ["Run model", "Visualize prediction resu
 
 
 if __name__ == "__main__":
-    demo.launch(share=True,debug=True)
+    demo.launch(debug=True)

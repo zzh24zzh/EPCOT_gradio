@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
 def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    print(device)
+
     if input_chrom == '' or cop_type == '':
         raise gradio.Error("The prediction options could not be empty")
     if atac_seq is None:
@@ -28,8 +31,7 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
     else:
         chrom, start, end = check_region(input_chrom, region_start,region_end, ref_genome,1000000)
 
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    print(device)
+
 
     out_epi_binding = predict_epb(os.path.abspath('models/epi_bind.pt'), [start, end], ref_genome, atac_seq, device,
                                   cop_type)
