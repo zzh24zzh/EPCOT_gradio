@@ -13,7 +13,7 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 ### Follow these steps to run the demo locally:
 
-####  1. Clone the repository
+####  1. Clone the repository and install required packages
 
 ```
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
