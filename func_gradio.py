@@ -1,64 +1,78 @@
+import gradio
 import numpy as np
-import torch,os
+import torch,os,pickle,uuid
 from util import check_region,predict_microc,predict_cage,predict_epis,filetobrowser,predict_hic,predict_epb
 from scipy.sparse import load_npz
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import GridSpec
 
-def predict_func(input_chrom, cop_type, input_region, input_file):
+def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
     if input_chrom == '' or cop_type == '':
-        raise ValueError("Please specify a genomic region of interest")
-    if input_file is None:
-        raise ValueError("Please provide an ATAC-seq file")
+        raise gradio.Error("The prediction options could not be empty")
+    if atac_seq is None:
+        raise gradio.Error("Must provide an ATAC-seq file!")
     if not os.path.exists('refSeq/hg38/chr%s.npz'%input_chrom):
-        raise ValueError("Please download the processed reference genome")
-    # if len(input_file) != 2:
-    #     raise ValueError("Please upload two files only, one for the reference genome and one for ATAC-seq")
+        raise gradio.Error("The reference genome must be downloaded!")
 
     ref_genome = load_npz('refSeq/hg38/chr%s.npz'%input_chrom).toarray()
-    atac_seq = load_npz(input_file.name).toarray()
 
-    if cop_type == 'Micro-C (enter a 500 kb region)':
-        chrom, start, end = check_region(input_chrom, input_region, ref_genome,500000)
+    try:
+        with open(atac_seq.name,'rb') as f:
+            tmp_atac=pickle.load(f)
+        atac_seq = tmp_atac[int(input_chrom)]
+    except Exception:
+        raise gradio.Error('The ATAC-seq file could not be read!')
+
+    if cop_type == 'Micro-C':
+        chrom, start, end = check_region(input_chrom, region_start,region_end, ref_genome,500000)
     else:
-        chrom, start, end = check_region(input_chrom, input_region, ref_genome,1000000)
+        chrom, start, end = check_region(input_chrom, region_start,region_end, ref_genome,1000000)
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
     out_epi_binding = predict_epb(os.path.abspath('models/epi_bind.pt'), [start, end], ref_genome, atac_seq, device,
-                               cop_type)
+                                  cop_type)
     out_cage = predict_cage(os.path.abspath('models/cage.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
 
     out_epi = predict_epis(os.path.abspath('models/epi_track.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
 
-    if cop_type == 'Micro-C (enter a 500 kb region)':
+    file_id = str(uuid.uuid4())
+    if cop_type == 'Micro-C':
         out_cop = predict_microc(os.path.abspath('models/microc.pt'), [start, end], ref_genome, atac_seq, device)
-        np.savez_compressed( 'tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+10000,end-10000),epb=out_epi_binding, epi=out_epi, cage=out_cage,
-                            cop=out_cop)
-        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start+10000,end-10000),
-                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+10000,end-10000)]
+        np.savez_compressed( 'tmps/prediction_%s.npz'%file_id,
+                             chrom= input_chrom,start =start+10000,end=end-10000,
+                             epi=out_epi,epb=out_epi_binding, cage=out_cage,cop=out_cop)
+        return ['tmps/prediction_%s.npz'%file_id,
+                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+10000,end-10000,file_id)]
     else:
         out_cop=predict_hic(os.path.abspath('models/hic.pt'), [start, end], ref_genome, atac_seq, device)
-        np.savez_compressed('tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 20000, end - 20000),epb=out_epi_binding, epi=out_epi,
-                            cage=out_cage,
-                            cop=out_cop)
+        np.savez_compressed('tmps/prediction_%s.npz'%file_id,
+                            chrom=input_chrom, start=start + 20000, end=end - 20000,
+                            epi=out_epi,epb=out_epi_binding, cage=out_cage,cop=out_cop)
 
-        return ['tmps/prediction_%s-%s-%s.npz' % (input_chrom, start + 20000, end - 20000),
-                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 20000, end - 20000)]
+        return ['tmps/prediction_%s.npz'%file_id,
+                filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 20000, end - 20000,file_id)]
 
 
-def make_plots(in_file,modal, maxv1, maxv2, epis):
+def make_plots(in_file,md,epis,epi_type, maxv1, maxv2,maxv3):
     import matplotlib
     matplotlib.use("Agg")
     # matplotlib.pyplot.switch_backend('Agg')
-    prediction = np.load(in_file.name)
-    maxv1,maxv2=float(maxv1),float(maxv2)
+    print(in_file)
+    if in_file is None:
+        raise gradio.Error('Must upload a prediction file!')
+    try:
+        prediction = np.load(in_file.name)
+    except Exception:
+        raise gradio.Error('The prediction file could not be read!')
+
+    maxv1,maxv2,maxv3=float(maxv1),float(maxv2),float(maxv3)
     with open(os.path.abspath('data/epigenomes.txt'), 'r') as f:
         epigenomes = f.read().splitlines()
 
     bins = prediction['cop'].shape[-1]
     if epis=='':
-        raise ValueError("Please choose epigenomic features to be visualized")
+        raise gradio.Error("No epigenomic feature is selected")
     num_mod = len(epis) + 1
     epi_idx=np.array([epigenomes.index(epi) for epi in epis])
 
@@ -118,7 +132,7 @@ def make_plots(in_file,modal, maxv1, maxv2, epis):
         axm.spines['right'].set_visible(False)
         axm.spines['bottom'].set_visible(False)
     for i in range(num_mod-1):
-        if modal=='tracks':
+        if epi_type=='Signal (arcsinh signal p-values)':
             axs[i].fill_between(np.arange(prediction['epi'].shape[0]), 0, prediction['epi'][:,epi_idx[i]])
             axs[i].set_ylim(0, maxv2)
             axs[i].text(2, maxv2, epis[i],va='top')
@@ -134,8 +148,8 @@ def make_plots(in_file,modal, maxv1, maxv2, epis):
     # tmp_cage=prediction['cage'].flatten().squeeze()
     # print(prediction['cage'].shape,tmp_cage.shape)
     axs[-1].fill_between(np.arange(prediction['cage'].shape[0]), 0, prediction['cage'])
-    axs[-1].set_ylim(0, 8)
-    axs[-1].text(2, 8, 'CAGE',va='top')
+    axs[-1].set_ylim(0, maxv3)
+    axs[-1].text(2, maxv3, 'CAGE',va='top')
     axs[-1].set_xticks([i*prediction['cage'].shape[0]//4 for i in range(5)])
     axs[-1].set_xticklabels([start+i*bins*seq_inter//4 for i in range(5)])
 

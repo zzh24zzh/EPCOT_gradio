@@ -82,11 +82,10 @@ def parser_args_microc(parent_parser):
 
 
 
-def check_region(chrom,region,ref_genome,region_len):
-    region=region.replace(',','')
-    start,end=list(map(int, region.split('-')))
+def check_region(chrom,start,end,ref_genome,region_len):
+    start,end=int(start),int(end)
     if end-start != region_len:
-        raise ValueError("Please enter a 1Mb region")
+        raise ValueError("Please enter a region with the correct length")
     if start<300 or end > ref_genome.shape[1]-300:
         raise ValueError("The start of input region should be greater than 300 and "
                          "the end of the region should be less than %s"%(ref_genome.shape[1]-300))
@@ -262,7 +261,7 @@ def predict_microc(
     return complete_mat(arraytouptri(temp, microc_args))
 
 
-def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
+def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end,file_id):
     import pyBigWig,os
     from zipfile import ZipFile
     import zipfile
@@ -271,8 +270,8 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
     with open('data/epigenomes.txt', 'r') as f:
         epigenomes = f.read().splitlines()
 
-    filename = str(uuid.uuid4())
-    files_to_zip = "tmps/browser_data/"+filename
+    # filename = str(uuid.uuid4())
+    files_to_zip = file_id
     if os.path.exists(files_to_zip):
         shutil.rmtree(files_to_zip)
     os.mkdir(files_to_zip)
@@ -326,14 +325,14 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end):
             with open(os.path.join(files_to_zip,"%s.bedpe"%types[i]), 'w') as f:
                 f.writelines(cop_lines)
 
-    out_zipfile = ZipFile("tmps/browser_data/tmp_%s-%s-%s.zip" % (chrom, start, end), "w", zipfile.ZIP_DEFLATED)
+    out_zipfile = ZipFile("prediction_%s.zip" % file_id, "w", zipfile.ZIP_DEFLATED)
     for file_to_zip in os.listdir(files_to_zip):
         file_to_zip_full_path = os.path.join(files_to_zip, file_to_zip)
         out_zipfile.write(filename=file_to_zip_full_path, arcname=file_to_zip)
 
     out_zipfile.close()
     shutil.rmtree(files_to_zip)
-    return "tmps/browser_data/tmp_%s-%s-%s.zip"%(chrom,start,end)
+    return "prediction_%s.zip"%file_id
 
 
 
