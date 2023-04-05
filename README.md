@@ -7,14 +7,6 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 * Python 3.9.12
 
-## Dependencies
-
-* deepTools-3.5.1
-
-* gradio-3.24.1
-
-* samtools-1.16.1
-
 
 ## Usage
 
@@ -43,7 +35,7 @@ python download.py
 * A processed ATAC-seq file in **.npz** format, which can be uploaded to the demo to excute models
 
 
-Dependencies: 
+#### Required packages: 
 * deepTools-3.5.1
 * samtools-1.16.1
 * pyBigWig-0.3.17
