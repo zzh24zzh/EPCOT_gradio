@@ -135,7 +135,7 @@ def predict_epb(
     inputs=torch.tensor(inputs).float().to(device)
     with torch.no_grad():
         pred_epi=torch.sigmoid(pretrain_model(inputs)).detach().cpu().numpy()
-    if cop_type == 'Micro-C (enter a 500 kb region)':
+    if cop_type == 'Micro-C':
         return pred_epi[10:-10,:]
     else:
         return pred_epi[20:-20,:]
@@ -155,7 +155,7 @@ def predict_epis(
     pretrain_model.to(device)
     inputs=[]
     start,end=region
-    if cop_type == 'Micro-C (enter a 500 kb region)':
+    if cop_type == 'Micro-C':
         inputs.append(generate_input(start,end,ref_genome,atac_seq))
     else:
         for loc in range(start+20000,end-20000,480000):
@@ -184,7 +184,7 @@ def predict_cage(
     cage_model.to(device)
     inputs = []
     start, end = region
-    if cop_type == 'Micro-C (enter a 500 kb region)':
+    if cop_type == 'Micro-C':
         inputs.append(generate_input(start, end, ref_genome, atac_seq))
     else:
         for loc in range(start + 20000, end - 20000, 480000):

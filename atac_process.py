@@ -48,7 +48,8 @@ def main():
     os.system('bamCoverage --bam %s -o %s --outFileFormat bigwig --normalizeUsing RPGC '
               '--effectiveGenomeSize 2913022398 --Offset 1 --binSize 1 --numberOfProcessors %s '
               '--blackListFileName data/black_list.bed'%(args.bam,fid+'.bigWig',args.num_processers))
-    print('---------')
+    print('---------\n')
+
     atac_bwtonpz(fid+'.bigWig')
 if __name__=="__main__":
     main()

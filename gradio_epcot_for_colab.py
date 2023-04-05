@@ -12,7 +12,6 @@ inputs = [
             label="ATAC-seq file",
             info="Path to the processed ATAC-seq file",
             lines=1,
-            # value="examples/atac_GM12878.pickle",
         ),
 ]
 outputs = [
@@ -27,7 +26,8 @@ app1 = gr.Interface(
     description='<a href="https://github.com/zzh24zzh/EPCOT_gradio" class="built-with svelte-1lyswbr" target="_blank" '
                 'style="font-size: 15px; font-color: black; font-weight:bold" rel="noreferrer">'
                 'View Documentation </a>',
-    # examples=[["11","Micro-C","10500000","11000000","examples/atac_GM12878.pickle"]]
+    examples=[["11", "Micro-C", "10500000", "11000000", "examples/atac_GM12878.pickle"],
+              ["11", "Hi-C (ChIA-PET)", "7750000", "8750000", "examples/atac_GM12878.pickle"]]
 )
 
 

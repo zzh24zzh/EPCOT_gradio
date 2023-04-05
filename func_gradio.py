@@ -72,7 +72,8 @@ def make_plots(in_file,md,epis,epi_type, maxv1, maxv2,maxv3):
         prediction = np.load(in_file.name)
     except Exception:
         raise gradio.Error('The prediction file cannot be read!')
-
+    for k,v in prediction.items():
+        print(k,v.shape)
     maxv1,maxv2,maxv3=float(maxv1),float(maxv2),float(maxv3)
     with open(os.path.abspath('data/epigenomes.txt'), 'r') as f:
         epigenomes = f.read().splitlines()
