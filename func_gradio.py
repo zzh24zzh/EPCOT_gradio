@@ -19,7 +19,7 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
     try:
         with open(atac_seq.name,'rb') as f:
             tmp_atac=pickle.load(f)
-        atac_seq = tmp_atac[int(input_chrom)]
+        atac_seq = tmp_atac[int(input_chrom)].toarray()
     except Exception:
         raise gradio.Error('The ATAC-seq file could not be read!')
 
@@ -30,6 +30,7 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
 
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
+
     out_epi_binding = predict_epb(os.path.abspath('models/epi_bind.pt'), [start, end], ref_genome, atac_seq, device,
                                   cop_type)
     out_cage = predict_cage(os.path.abspath('models/cage.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
@@ -37,20 +38,24 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
     out_epi = predict_epis(os.path.abspath('models/epi_track.pt'), [start, end], ref_genome, atac_seq, device, cop_type)
 
     file_id = str(uuid.uuid4())
+
+    if not os.path.exists('results'):
+        os.mkdir('results')
+
     if cop_type == 'Micro-C':
         out_cop = predict_microc(os.path.abspath('models/microc.pt'), [start, end], ref_genome, atac_seq, device)
-        np.savez_compressed( 'tmps/prediction_%s.npz'%file_id,
+        np.savez_compressed( 'results/prediction_%s.npz'%file_id,
                              chrom= input_chrom,start =start+10000,end=end-10000,
                              epi=out_epi,epb=out_epi_binding, cage=out_cage,cop=out_cop)
-        return ['tmps/prediction_%s.npz'%file_id,
+        return ['results/prediction_%s.npz'%file_id,
                 filetobrowser(out_epi,out_cage,out_cop,input_chrom, start+10000,end-10000,file_id)]
     else:
         out_cop=predict_hic(os.path.abspath('models/hic.pt'), [start, end], ref_genome, atac_seq, device)
-        np.savez_compressed('tmps/prediction_%s.npz'%file_id,
+        np.savez_compressed('results/prediction_%s.npz'%file_id,
                             chrom=input_chrom, start=start + 20000, end=end - 20000,
                             epi=out_epi,epb=out_epi_binding, cage=out_cage,cop=out_cop)
 
-        return ['tmps/prediction_%s.npz'%file_id,
+        return ['results/prediction_%s.npz'%file_id,
                 filetobrowser(out_epi,out_cage,out_cop,input_chrom, start + 20000, end - 20000,file_id)]
 
 
@@ -141,9 +146,9 @@ def make_plots(in_file,md,epis,epi_type, maxv1, maxv2,maxv3):
             axs[i].set_ylim(0, 1)
             axs[i].text(2, 1, epis[i], va='top')
 
-    start=int(in_file.name.split('-')[1])
-    chrom=int(in_file.name.split('prediction_')[1].split('-')[0])
-    end= start+480000 if bins==480 else start + 960000
+    start=int(prediction['start'])
+    chrom=int(prediction['chrom'])
+    end= int(prediction['end'])
     seq_inter=1000 if bins==480 else 5000
     # tmp_cage=prediction['cage'].flatten().squeeze()
     # print(prediction['cage'].shape,tmp_cage.shape)

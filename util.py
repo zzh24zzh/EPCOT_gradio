@@ -325,14 +325,14 @@ def filetobrowser(out_epis,out_cages,out_cop,chrom,start,end,file_id):
             with open(os.path.join(files_to_zip,"%s.bedpe"%types[i]), 'w') as f:
                 f.writelines(cop_lines)
 
-    out_zipfile = ZipFile("prediction_%s.zip" % file_id, "w", zipfile.ZIP_DEFLATED)
+    out_zipfile = ZipFile("results/prediction_%s.zip" % file_id, "w", zipfile.ZIP_DEFLATED)
     for file_to_zip in os.listdir(files_to_zip):
         file_to_zip_full_path = os.path.join(files_to_zip, file_to_zip)
         out_zipfile.write(filename=file_to_zip_full_path, arcname=file_to_zip)
 
     out_zipfile.close()
     shutil.rmtree(files_to_zip)
-    return "prediction_%s.zip"%file_id
+    return "results/prediction_%s.zip"%file_id
 
 
 
