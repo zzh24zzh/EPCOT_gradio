@@ -1,8 +1,8 @@
 # EPCOT Gradio demo
 
-Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin contact maps with an easy-to-use Gradio interface.
+Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin contact maps using the Gradio demo.
 
-The demo includes two interfaces: (1) to run the model, and (2) to visualize prediction results. Users only need to provide a processed ATAC-seq file, which can be generated from a .bam file using the provided script [atac_process.py](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/atac_process.py) (refer to step 3 in Usage).
+The demo features two user-friendly interfaces: (1) to run the model, and (2) to visualize prediction results. Users only need to provide a processed ATAC-seq file, which can be generated from a .bam file using the provided script [atac_process.py](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/atac_process.py) (refer to step 3 in Usage).
 
 ## Prerequisites
 
@@ -29,13 +29,9 @@ python download.py
 ```
 
 
-####  3. Prepare input ATAC-seq data (process_atac.py)
-##### Input
-* An ATAC-seq profile in **.bam** format
-* The number of processors to use in deepTools's bamCoverage
+####  3. Prepare input ATAC-seq data (atac_process.py)
 
-##### Output
-* A processed ATAC-seq file in **.npz** format, which can be uploaded to the demo to excute models
+ Process an ATAC-seq bam file (hg38 version) to ouput a processed ATAC-seq file in **.pickle** format, which can be uploaded to the demo to excute models
 
 
 ##### Required packages: 
@@ -43,7 +39,7 @@ python download.py
 * samtools-1.16.1
 * pyBigWig-0.3.17
 ```
-python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
+python atac_process.py -b <ATAC-seq bam file> -p <number of processors>
 ```
 
 
