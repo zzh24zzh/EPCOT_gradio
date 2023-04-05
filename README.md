@@ -13,13 +13,13 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 ### Follow these steps to run the demo locally:
 
-* ####  Clone the repository
+####  1. Clone the repository
 
 ```
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
-* ####  Download trained models and reference genome data (download.py)
+####  2. Download trained models and reference genome data (download.py)
 
 The pre-trained models will be downloaded to the "models/" directory, and the reference sequence data will be downloaded to the "refSeq/" directory. 
 ```
@@ -27,7 +27,7 @@ python download.py
 ```
 
 
-* ####  Prepare input ATAC-seq data (process_atac.py)
+####  3. Prepare input ATAC-seq data (process_atac.py)
 ##### Input
 * An ATAC-seq profile in **.bam** format
 * The number of processors to use in deepTools's bamCoverage
@@ -46,7 +46,7 @@ python process_atac.py -b <ATAC-seq bam file> -p <number of processors>
 
 
 
-* ####  Run Gradio demo
+####  4. Run Gradio demo
 
 ```
 python gradio_epcot.py
