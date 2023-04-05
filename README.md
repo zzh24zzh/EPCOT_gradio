@@ -1,7 +1,8 @@
 # EPCOT Gradio demo
 
-
 Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin contact maps with an easy-to-use Gradio interface.
+
+The demo includes two interfaces to (1) run model and (2) visualize prediction results. The only file required from users is a ATAC-seq profile which can be processed from a .bam file by running the script [process_atac.py]().
 
 ## Prerequisites
 
@@ -10,8 +11,7 @@ Mapping ATAC-seq to epigenome, transcriptome, and high-resolution chromatin cont
 
 ## Usage
 
-
-### Follow these steps to run the demo locally:
+Follow these steps to run the demo locally:
 
 ####  1. Clone the repository and install required packages
 
