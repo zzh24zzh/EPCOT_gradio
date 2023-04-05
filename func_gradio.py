@@ -9,7 +9,6 @@ from matplotlib.gridspec import GridSpec
 def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     print(device)
-
     if input_chrom == '' or cop_type == '':
         raise gradio.Error("The prediction options cannot be empty")
     if atac_seq is None:
@@ -18,7 +17,6 @@ def predict_func(input_chrom,cop_type, region_start,region_end, atac_seq):
         raise gradio.Error("The reference genome must be downloaded!")
 
     ref_genome = load_npz('refSeq/hg38/chr%s.npz'%input_chrom).toarray()
-    print(atac_seq.name)
     try:
         with open(atac_seq.name,'rb') as f:
             tmp_atac=pickle.load(f)
@@ -65,15 +63,12 @@ def make_plots(in_file,md,epis,epi_type, maxv1, maxv2,maxv3):
     import matplotlib
     matplotlib.use("Agg")
     # matplotlib.pyplot.switch_backend('Agg')
-    print(in_file)
     if in_file is None:
         raise gradio.Error('Must upload a prediction file!')
     try:
         prediction = np.load(in_file.name)
     except Exception:
         raise gradio.Error('The prediction file cannot be read!')
-    for k,v in prediction.items():
-        print(k,v.shape)
     maxv1,maxv2,maxv3=float(maxv1),float(maxv2),float(maxv3)
     with open(os.path.abspath('data/epigenomes.txt'), 'r') as f:
         epigenomes = f.read().splitlines()
@@ -85,8 +80,8 @@ def make_plots(in_file,md,epis,epi_type, maxv1, maxv2,maxv3):
     epi_idx=np.array([epigenomes.index(epi) for epi in epis])
 
 
-    plt.rcParams['font.sans-serif'] = 'Arial'
-    plt.rcParams['font.family'] = 'sans-serif'
+    # plt.rcParams['font.sans-serif'] = 'Arial'
+    # plt.rcParams['font.family'] = 'sans-serif'
     plt.rcParams['font.size'] = 14
 
     if bins==480:
