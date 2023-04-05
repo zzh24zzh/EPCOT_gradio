@@ -34,7 +34,7 @@ python download.py
  Process an ATAC-seq bam file (hg38 version) to ouput a processed ATAC-seq file in **.pickle** format, which can be uploaded to the demo to excute models
 
 
-##### Required packages: 
+**Required packages**: 
 * deepTools-3.5.1
 * samtools-1.16.1
 * pyBigWig-0.3.17
