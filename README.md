@@ -11,6 +11,7 @@ The demo includes two interfaces: (1) to run the model, and (2) to visualize pre
 
 ## Usage
 
+The demo can be deployed on Google Colab notebook where the GPUs can speed up running the models. Here is an example
 
 Follow these steps to run the demo locally:
 
