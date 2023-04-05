@@ -30,8 +30,6 @@ app1 = gr.Interface(
                 'style="font-size: 15px; font-color: black; font-weight:bold" rel="noreferrer">'
                 'View Documentation </a>',
     interpretation='explain',
-    examples=[["11","Micro-C","10500000","11000000",
-              os.path.join(os.path.dirname(__file__),"atac_36edf5f4-8824-4e1d-b031-451c5df505f0.pickle")]]
 )
 
 
@@ -41,8 +39,8 @@ inputs1 = [
     gr.File(label="Upload the prediction file (in .npz format))"),
     gr.Markdown(value='### Visualization options'),
     gr.Dropdown(epis,label='Select epigenome features to be plotted',multiselect=True,max_choices=8,value=['CTCF','H3K4me3']),
-    gr.Radio(['Signal (arcsinh signal p-values)','Binding probability'], label='Choose the type of epigenomic feature data'
-             , default='Signal (arcsinh signal p-values)'),
+    gr.Radio(choices=['Signal (arcsinh signal p-values)','Binding probability'], label='Choose the type of epigenomic feature data'
+             , value='Signal (arcsinh signal p-values)'),
     gr.Slider(maximum=16,label="Set the range of values displayed on the contact map plot",value=6),
     gr.Slider(maximum=12,label="Set the range of values displayed on the epigenomic feature plot",value=4),
     gr.Slider(maximum=12,label="Set the range of values displayed on the CAGE-seq plot",value=8),
