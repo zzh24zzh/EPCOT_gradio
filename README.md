@@ -58,7 +58,7 @@ In the first interface, users can enter a genomic region and execute models to g
 * a file named **"prediction_xxxx.npz"**, which can be uploaded to the second interface for visualization,
 * a file named **"formatted_xxxx.zip"**, which contains ChIP-seq and CAGE-seq data in .bigWig format, and contact maps in .bedpe format.
 
-The two files can also be found under the **"results/"** directory.
+The two files can also be found under the "results/" directory.
 
 
 ```
