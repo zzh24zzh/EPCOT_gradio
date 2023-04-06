@@ -51,6 +51,16 @@ python atac_process.py -b <ATAC-seq bam file> -p <number of processors>
 
 ####  4. Launch the Gradio demo
 
+The demo has two interfaces: **(1) Run Model**, and **(2) Visualize Prediction Results**.
+
+In the first interface, users can enter a genomic region and execute models to generate predictions, including
+
+* a file named **"prediction_xxxx.npz"**, which can be uploaded to the second interface for visualization,
+* a file named **"formatted_xxxx.zip"**, which contains ChIP-seq and CAGE-seq data in .bigWig format, and contact maps in .bedpe format.
+
+The two files can also be found under the **"results/"** folder.
+
+
 ```
 python gradio_epcot.py
 ```
