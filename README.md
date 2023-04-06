@@ -52,6 +52,8 @@ python gradio_epcot.py
 
 After completing these steps, you will be able to use the Gradio interface to run the EPCOT model on your ATAC-seq data and visualize the results.
 
+![](https://github.com/Your_Repository_Name/Your_GIF_Name.gif)
+
 The predicted modalities include:
 
 | Data       | Standard |
