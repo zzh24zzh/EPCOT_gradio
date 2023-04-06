@@ -28,6 +28,11 @@ To run the demo locally, follow these steps:
 git clone https://github.com/zzh24zzh/EPCOT_gradio.git
 ```
 
+Install python packages
+```
+pip install -r requirements.txt
+```
+
 ####  2. Download trained models and reference genome data in hg38 version (download.py)
 
 The pre-trained models will be downloaded to the "models/" directory, and the reference sequence data will be downloaded to the "refSeq/" directory. 
