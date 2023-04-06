@@ -1,0 +1,7 @@
+numpy==1.19.5
+pyBigWig==0.3.17
+scipy==1.9.1
+torch==1.10.1
+einops==0.3.2
+gradio==3.24.1
+gdown==4.7.1
