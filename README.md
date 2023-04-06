@@ -39,7 +39,7 @@ python download.py
 ####  3. Prepare input ATAC-seq data (atac_process.py)
 
  Process an ATAC-seq .bam file (hg38 version) to ouput a processed ATAC-seq file in **.pickle** format, which can be uploaded to the demo to excute models.
- It is recommended to generate the .bam file using the [ENCODE ATAC-seq processing pipeline](https://github.com/ENCODE-DCC/atac-seq-pipeline) and downsample the .bam file to 30M aligned reads using [DownsampleSam](https://gatk.broadinstitute.org/hc/en-us/articles/360037056792-DownsampleSam-Picard-).
+ It is recommended to generate the .bam file using the [ENCODE ATAC-seq processing pipeline](https://github.com/ENCODE-DCC/atac-seq-pipeline) and downsample the .bam file to around 30M aligned reads using [DownsampleSam](https://gatk.broadinstitute.org/hc/en-us/articles/360037056792-DownsampleSam-Picard-).
 
 
 **Required packages**: 
