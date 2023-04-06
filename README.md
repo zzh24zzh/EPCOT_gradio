@@ -54,6 +54,8 @@ After completing these steps, you will be able to use the Gradio interface to ru
 
 ![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface1.gif)
 
+![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface2.gif)
+
 The predicted modalities include:
 
 | Data       | Standard |
