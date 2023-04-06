@@ -5,8 +5,8 @@ This repository contains a Gradio demo for mapping ATAC-seq data to epigenomes, 
 The demo features two user-friendly interfaces: (1) to run the model, and (2) to visualize prediction results. Users only need to provide a processed ATAC-seq file, which can be generated from a .bam file using the provided script [atac_process.py](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/atac_process.py) (refer to step 3 in Usage).
 
 ![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface1.gif)
-
 ![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface2.gif)
+
 
 ## Prerequisites
 
