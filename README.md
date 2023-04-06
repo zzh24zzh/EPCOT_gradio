@@ -48,9 +48,8 @@ python download.py
 
 
 **Required packages**: 
-* deepTools-3.5.1
-* samtools-1.16.1
-* pyBigWig-0.3.17
+* [samtools](http://www.htslib.org/download/)-1.16.1
+
 ```
 python atac_process.py -b <ATAC-seq bam file> -p <number of processors>
 ```
