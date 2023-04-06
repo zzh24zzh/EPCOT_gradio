@@ -13,7 +13,7 @@ The demo features two user-friendly interfaces: (1) to run the model, and (2) to
 
 ## Prerequisites
 
-* Python 3.9.12
+* Python 3.9
 
 
 ## Usage
