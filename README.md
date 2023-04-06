@@ -6,7 +6,9 @@ The demo features two user-friendly interfaces: (1) to run the model, and (2) to
 
 ![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface1.gif)
 
-![](https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface2.gif)
+
+<img src="https://github.com/zzh24zzh/EPCOT_gradio/blob/main/data/interface2.gif" width="720" height="360"/>
+
 
 
 ## Prerequisites
