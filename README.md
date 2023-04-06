@@ -48,7 +48,7 @@ python download.py
 
 
 **Required packages**: 
-* [samtools](http://www.htslib.org/download/)-1.16.1
+* [samtools](http://www.htslib.org/download/)
 
 ```
 python atac_process.py -b <ATAC-seq bam file> -p <number of processors>
