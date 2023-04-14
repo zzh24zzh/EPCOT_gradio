@@ -21,11 +21,9 @@ app1 = gr.Interface(
     inputs=inputs,
     outputs=outputs,
     title='A computational tool to use ATAC-seq to impute epigenome, transcriptome, and high-resolution chromatin contact maps',
-    allow_flagging='manual',
     description='<a href="https://github.com/zzh24zzh/EPCOT_gradio" class="built-with svelte-1lyswbr" target="_blank" '
                 'style="font-size: 15px; font-color: black; font-weight:bold" rel="noreferrer">'
                 'View Documentation </a>',
-
     examples=[["11","Micro-C","10500000","11000000","examples/atac_GM12878.pickle"],
         ["11","Hi-C (ChIA-PET)","7750000","8750000","examples/atac_GM12878.pickle"]]
 )
@@ -48,21 +46,10 @@ app2 = gr.Interface(
     fn=make_plots,
     inputs=inputs1,
     outputs=outputs1,
-    live=True,
-    allow_flagging='manual'
+    live=True
 )
 
 demo = gr.TabbedInterface([app1, app2], ["Run model", "Visualize prediction results"],
-                          css=".gradio-container-3-24-1 {font-weight:bold}"
-                              "h1 {font-family: verdana; color:grey} div {border-color: black}"
-                                ".selected.svelte-1g805jl {border-color: white;border-width:2.5px; font-weight:bold;border-bottom-width:1px} "
-                              ".tab-nav.svelte-1g805jl{border-bottom-color: white;border-bottom-width:2.5px}"
-                              "div.tabitem {border-color: white;border-width:2.5px}" 
-                              "button.svelte-1g805jl{font-weight:bold}"
-                              "body{background-color: white;}"
-                ".gradio-container{background-color: #e5e5f7;"
-                          "background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #e5e5f7 10px ),"
-                          " repeating-linear-gradient(#fffcdc,#d9a7c7) ",
                           theme=gr.themes.Soft())
 
 
