@@ -54,6 +54,8 @@ def main():
     print('---------\n')
 
     atac_bwtonpz(fid+'.bigWig')
+    os.remove(args.bam + '.bai')
+    os.remove(fid+'.bigWig')
 if __name__=="__main__":
     main()
 
