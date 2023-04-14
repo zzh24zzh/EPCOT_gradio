@@ -31,11 +31,14 @@ def atac_bwtonpz(atac_file):
 
         seq_length = length // 1000 * 1000
         signals[chr] = csr_matrix(temp.astype('float32')[:seq_length])
-    with open('atac_'+atac_file.replace('bigWig','pickle'),'wb') as f:
+
+    if not os.path.exists('ATAC'):
+        os.mkdir('ATAC')
+    with open('ATAC/atac_'+atac_file.replace('bigWig','pickle'),'wb') as f:
         pickle.dump(signals,f)
 
     print('The processed ATAC-seq file has been saved to ' + os.path.abspath(
-        'atac_' + atac_file.replace('bigWig', 'pickle')))
+        'ATAC/atac_' + atac_file.replace('bigWig', 'pickle')))
 
 
 
