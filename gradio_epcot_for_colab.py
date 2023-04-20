@@ -36,12 +36,12 @@ with open(os.path.abspath('data/epigenomes.txt'), 'r') as f:
 inputs1 = [
     gr.File(label="Prediction file (in .npz format))"),
     gr.Markdown(value='### Visualization options'),
-    gr.Dropdown(epis,label='Epigenome features',multiselect=True,max_choices=8,value=['CTCF','H3K4me3']),
-    gr.Radio(choices=['Signal p-values (archsinh)','Binding probability'], label='Choose the type of epigenomic feature data'
+    gr.Dropdown(epis,label='Epigenome features',multiselect=True,max_choices=10,value=['CTCF','H3K4me3']),
+    gr.Radio(choices=['Signal p-values (archsinh)','Binding probability'], label='Type of epigenomic feature data'
              , value='Signal p-values (archsinh)'),
-    gr.Slider(maximum=16,label="Range of values displayed on the contact map plot",value=6),
-    gr.Slider(maximum=12,label="Range of values displayed on the epigenomic feature plot",value=4),
-    gr.Slider(maximum=12,label="Range of values displayed on the CAGE-seq plot",value=8),
+    gr.Slider(maximum=16,label='Range of values displayed on the plots',info="Choose between 0 and 16 (contact maps)",value=4),
+    gr.Slider(minimum=2,maximum=12,info="Choose between 2 and 12 (epigenomic feature signals)",value=4,show_label=False),
+    gr.Slider(minimum=2,maximum=12,info="Choose between 2 and 12 (CAGE-seq)",value=8,show_label=False),
 ]
 outputs1 = gr.Plot(label='Plots')
 app2 = gr.Interface(
